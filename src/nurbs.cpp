@@ -16,7 +16,6 @@ ushort Math::binom(const ushort n, const ushort i){
 };
 
 
-template<typename parameter>
 parameter Math::bezier(const parameter u, const ushort p, const ushort i){
     // Computes bezier B_{i, p} = binom(p, i) * (1-u)^(p-i) * u^i
     const parameter v = 1 - u;
@@ -29,7 +28,6 @@ parameter Math::bezier(const parameter u, const ushort p, const ushort i){
 }
 
 
-template<typename parameter>
 ushort find_degree(const std::vector<parameter> &init_vector){
     ushort degree = 0;
     for(ushort i=1; i<init_vector.size(); i++)
@@ -39,28 +37,24 @@ ushort find_degree(const std::vector<parameter> &init_vector){
 };
 
 
-template<typename parameter>
 ushort find_npts(const std::vector<parameter> &init_vector){
     ushort degree = find_degree(init_vector);
     return init_vector.size() - degree - 1;
 };
 
 
-template<typename parameter>
-const parameter& KnotVector<parameter>::operator[](const ushort index) const{
+const parameter& KnotVector::operator[](const ushort index) const{
     return this->internal[index];
 };
 
 
-template<typename parameter>
-KnotVector<parameter>::KnotVector(const std::vector<parameter> &init_vector) :
+KnotVector::KnotVector(const std::vector<parameter> &init_vector) :
     internal(init_vector),
     degree(find_degree(init_vector)),
     npts(find_npts(init_vector)){}
 
 
-template<typename parameter>
-ushort KnotVector<parameter>::span(const parameter node){
+ushort KnotVector::span(const parameter node){
     ushort low, mid, high;
     if(node == internal[npts])
         return npts - 1;
@@ -79,8 +73,7 @@ ushort KnotVector<parameter>::span(const parameter node){
 }
 
 
-template<typename parameter>
-ushort KnotVector<parameter>::mult(const parameter node){
+ushort KnotVector::mult(const parameter node){
     ushort i, sum = 0;
     for(i=0; i <= degree + npts; i++)
         if(internal[i] == node)
@@ -89,20 +82,18 @@ ushort KnotVector<parameter>::mult(const parameter node){
 };
 
 
-template<typename parameter>
-KnotVector<parameter> GeneratorKnotVector::bezier(const ushort degree){
+KnotVector GeneratorKnotVector::bezier(const ushort degree){
     const ushort size = 2 * degree + 2;
     std::vector<parameter> vect(size);
     for(ushort i=0; i<=degree; i++)
         vect[i] = 0;
     for(ushort i=degree+1; i<size; i++)
         vect[i] = 1;
-    return KnotVector<parameter>(vect);
+    return KnotVector(vect);
 };
 
 
-template<typename parameter>
-KnotVector<parameter> GeneratorKnotVector::uniform(const ushort degree, const ushort npts){
+KnotVector GeneratorKnotVector::uniform(const ushort degree, const ushort npts){
     const ushort size = degree + npts + 1;
     const ushort maxi = npts - degree;
     std::vector<parameter> vect(size);
@@ -112,19 +103,11 @@ KnotVector<parameter> GeneratorKnotVector::uniform(const ushort degree, const us
         vect[degree + i] = (static_cast<parameter>(i))/maxi;
     for(ushort i=npts; i<size; i++)
         vect[i] = 1;
-    return KnotVector<parameter>(vect);
+    return KnotVector(vect);
 };
 
 
-template class KnotVector<double>;
-template int Math::bezier<int>(int, ushort, ushort);
-template float Math::bezier<float>(float, ushort, ushort);
-template double Math::bezier<double>(double, ushort, ushort);
-template KnotVector<double> GeneratorKnotVector::bezier<double>(const ushort);
-template KnotVector<double> GeneratorKnotVector::uniform<double>(const ushort, const ushort);
-
-
-std::ostream& operator<<(std::ostream &os, const KnotVector<double>& knotvector){
+std::ostream& operator<<(std::ostream &os, const KnotVector& knotvector){
     const ushort size = knotvector.degree + knotvector.npts;
     for(ushort i=0; i < size; i++)
         os << knotvector[i] << " ";

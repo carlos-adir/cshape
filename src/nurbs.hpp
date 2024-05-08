@@ -4,16 +4,15 @@
 #include <iostream>
 #include <vector>
 
+typedef double parameter;
 typedef unsigned short ushort;
 
 namespace Math{
     ushort binom(const ushort n, const ushort i);
-    template<typename parameter>
     parameter bezier(const parameter u, const ushort p, const ushort i);
 };
 
 
-template<typename parameter>
 class KnotVector
 {
 private:
@@ -28,13 +27,13 @@ public:
     ushort mult(const parameter node);
 };
 
-std::ostream& operator<<(std::ostream &os, const KnotVector<double>& knotvector);
+
+std::ostream& operator<<(std::ostream &os, const KnotVector & knotvector);
+
 
 namespace GeneratorKnotVector{
-    template<typename parameter>
-    KnotVector<parameter> bezier(const ushort degree);
-    template<typename parameter>
-    KnotVector<parameter> uniform(const ushort degree, const ushort npts);
+    KnotVector bezier(const ushort degree);
+    KnotVector uniform(const ushort degree, const ushort npts);
 };
 
 #endif

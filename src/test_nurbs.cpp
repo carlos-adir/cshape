@@ -166,38 +166,38 @@ void test_bezier()
 
 void test_degree()
 {
-    KnotVector<double> knotvector0({0, 1});
+    KnotVector knotvector0({0, 1});
     IS_TRUE(knotvector0.degree == 0);
-    KnotVector<double> knotvector1({0, 0, 1, 1});
+    KnotVector knotvector1({0, 0, 1, 1});
     IS_TRUE(knotvector1.degree == 1);
-    KnotVector<double> knotvector2({0, 0, 0, 1, 1, 1});
+    KnotVector knotvector2({0, 0, 0, 1, 1, 1});
     IS_TRUE(knotvector2.degree == 2);
-    KnotVector<double> knotvector3({0, 0, 0, 0, 1, 1, 1, 1});
+    KnotVector knotvector3({0, 0, 0, 0, 1, 1, 1, 1});
     IS_TRUE(knotvector3.degree == 3);
-    KnotVector<double> knotvector4({0, 0, 0.5, 1, 1});
+    KnotVector knotvector4({0, 0, 0.5, 1, 1});
     IS_TRUE(knotvector4.degree == 1);
-    KnotVector<double> knotvector5({0, 0, 0, 0.5, 1, 1, 1});
+    KnotVector knotvector5({0, 0, 0, 0.5, 1, 1, 1});
     IS_TRUE(knotvector5.degree == 2);
-    KnotVector<double> knotvector6({0, 0, 0, 0, 0.5, 1, 1, 1, 1});
+    KnotVector knotvector6({0, 0, 0, 0, 0.5, 1, 1, 1, 1});
     IS_TRUE(knotvector6.degree == 3);
 };
 
 
 void test_npts()
 {
-    KnotVector<double> knotvector0({0, 1});
+    KnotVector knotvector0({0, 1});
     IS_TRUE(knotvector0.npts == 1);
-    KnotVector<double> knotvector1({0, 0, 1, 1});
+    KnotVector knotvector1({0, 0, 1, 1});
     IS_TRUE(knotvector1.npts == 2);
-    KnotVector<double> knotvector2({0, 0, 0, 1, 1, 1});
+    KnotVector knotvector2({0, 0, 0, 1, 1, 1});
     IS_TRUE(knotvector2.npts == 3);
-    KnotVector<double> knotvector3({0, 0, 0, 0, 1, 1, 1, 1});
+    KnotVector knotvector3({0, 0, 0, 0, 1, 1, 1, 1});
     IS_TRUE(knotvector3.npts == 4);
-    KnotVector<double> knotvector4({0, 0, 0.5, 1, 1});
+    KnotVector knotvector4({0, 0, 0.5, 1, 1});
     IS_TRUE(knotvector4.npts == 3);
-    KnotVector<double> knotvector5({0, 0, 0, 0.5, 1, 1, 1});
+    KnotVector knotvector5({0, 0, 0, 0.5, 1, 1, 1});
     IS_TRUE(knotvector5.npts == 4);
-    KnotVector<double> knotvector6({0, 0, 0, 0, 0.5, 1, 1, 1, 1});
+    KnotVector knotvector6({0, 0, 0, 0, 0.5, 1, 1, 1, 1});
     IS_TRUE(knotvector6.npts == 5);
 };
 
@@ -207,7 +207,7 @@ void test_generate_bezier(){
     unsigned short degree;
     for(degree=0; degree<10; degree++){
         const unsigned short npts = degree + 1;
-        KnotVector<double> knotvector = GeneratorKnotVector::bezier<double>(degree);
+        KnotVector knotvector = GeneratorKnotVector::bezier(degree);
         IS_TRUE(knotvector.degree == degree);
         IS_TRUE(knotvector.npts == degree+1);
         IS_TRUE(knotvector[0] == 0);
@@ -222,7 +222,7 @@ void test_generate_uniform(){
     unsigned short degree, npts;
     for(degree=0; degree<10; degree++)
         for(npts=degree+1; npts<degree+10; npts++){
-            KnotVector<double> knotvector = GeneratorKnotVector::uniform<double>(degree, npts);
+            KnotVector knotvector = GeneratorKnotVector::uniform(degree, npts);
             IS_TRUE(knotvector.degree == degree);
             IS_TRUE(knotvector.npts == npts);
             IS_TRUE(knotvector[0] == 0);
@@ -237,7 +237,7 @@ void test_span(){
     unsigned short degree, npts;
     for(degree=0; degree<10; degree++){ // Bezier
         npts = degree + 1;
-        KnotVector<double> knotvector = GeneratorKnotVector::bezier<double>(degree);
+        KnotVector knotvector = GeneratorKnotVector::bezier(degree);
         IS_TRUE(knotvector.span(0) == degree);
         IS_TRUE(knotvector.span(0.5) == degree);
         IS_TRUE(knotvector.span(1) == degree);
@@ -245,11 +245,11 @@ void test_span(){
     
     for(degree=0; degree<4; degree++) // Uniform
         for(npts=degree+1; npts<degree+5; npts++){
-            KnotVector<double> knotvector = GeneratorKnotVector::uniform<double>(degree, npts);
+            KnotVector knotvector = GeneratorKnotVector::uniform(degree, npts);
             IS_TRUE(knotvector.span(0) == degree);
             IS_TRUE(knotvector.span(1) == npts-1);
         }
-    KnotVector<double> knotvector({0, 0, 0, 1, 2, 2, 3, 4, 4, 4});
+    KnotVector knotvector({0, 0, 0, 1, 2, 2, 3, 4, 4, 4});
     IS_TRUE(knotvector.span(0) == 2);
     IS_TRUE(knotvector.span(0.5) == 2);
     IS_TRUE(knotvector.span(1) == 3);
@@ -266,18 +266,18 @@ void test_mult(){
     unsigned short degree, npts;
     for(
         degree=0; degree<10; degree++){ // Bezier
-        KnotVector<double> knotvector = GeneratorKnotVector::bezier<double>(degree);
+        KnotVector knotvector = GeneratorKnotVector::bezier(degree);
         IS_TRUE(knotvector.mult(0) == degree + 1);
         IS_TRUE(knotvector.mult(0.5) == 0);
         IS_TRUE(knotvector.mult(1) == degree + 1);
     }
     for(degree=0; degree<10; degree++) // Uniform
         for(npts=degree+1; npts<degree+4; npts++){
-            KnotVector<double> knotvector = GeneratorKnotVector::uniform<double>(degree, npts);
+            KnotVector knotvector = GeneratorKnotVector::uniform(degree, npts);
             IS_TRUE(knotvector.mult(0) == degree + 1);
             IS_TRUE(knotvector.mult(1) == degree + 1);
         }
-    KnotVector<double> knotvector({0, 0, 0, 1, 2, 2, 3, 4, 4, 4});
+    KnotVector knotvector({0, 0, 0, 1, 2, 2, 3, 4, 4, 4});
     IS_TRUE(knotvector.mult(0) == 3);
     IS_TRUE(knotvector.mult(0.5) == 0);
     IS_TRUE(knotvector.mult(1) == 1);
@@ -291,7 +291,7 @@ void test_mult(){
 
 
 void test_print(){
-    KnotVector<double> knotvector = GeneratorKnotVector::uniform<double>(1, 3);
+    KnotVector knotvector = GeneratorKnotVector::uniform(1, 3);
     std::cout << knotvector << std::endl;
 };
 
