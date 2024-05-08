@@ -4,10 +4,12 @@
 #include <iostream>
 #include <vector>
 
+typedef unsigned short ushort;
+
 namespace Math{
-    unsigned short binom(const unsigned short n, const unsigned short i);
+    ushort binom(const ushort n, const ushort i);
     template<typename parameter>
-    parameter bezier(const parameter u, const unsigned short p, const unsigned short i);
+    parameter bezier(const parameter u, const ushort p, const ushort i);
 };
 
 
@@ -19,20 +21,20 @@ private:
 public:
     KnotVector(const std::vector<parameter> &init_vector);
     ~KnotVector() = default;
-    const parameter& operator[](const unsigned short index) const;
-    const unsigned short degree;
-    const unsigned short npts;
-    unsigned short span(const parameter node);
-    unsigned short mult(const parameter node);
+    const parameter& operator[](const ushort index) const;
+    const ushort degree;
+    const ushort npts;
+    ushort span(const parameter node);
+    ushort mult(const parameter node);
 };
 
 std::ostream& operator<<(std::ostream &os, const KnotVector<double>& knotvector);
 
 namespace GeneratorKnotVector{
     template<typename parameter>
-    KnotVector<parameter> bezier(const unsigned short degree);
+    KnotVector<parameter> bezier(const ushort degree);
     template<typename parameter>
-    KnotVector<parameter> uniform(const unsigned short degree, const unsigned short npts);
+    KnotVector<parameter> uniform(const ushort degree, const ushort npts);
 };
 
 #endif
