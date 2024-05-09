@@ -8,7 +8,8 @@ CXXFLAGS = -g -Wall
 OUTPUT = a.out
 
 # Source files
-SOURCES = test_nurbs.cpp nurbs.cpp
+# SOURCES = test_math.cpp math.cpp
+SOURCES = test_basis.cpp nurbs.cpp
 
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)

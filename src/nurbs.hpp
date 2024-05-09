@@ -7,9 +7,18 @@
 typedef double parameter;
 typedef unsigned short ushort;
 
-namespace Math{
-    ushort binom(const ushort n, const ushort i);
-    parameter bezier(const parameter u, const ushort p, const ushort i);
+
+template <typename T>
+class Array {
+private:
+    std::vector<T> data;
+public:
+    Array(const std::vector<ushort> inshape);
+    ~Array() = default;
+    const T& operator[](const std::vector<ushort> indexs) const;
+    T& operator[](const std::vector<ushort> indexs);
+    const ushort ndim;
+    const std::vector<ushort> shape;
 };
 
 
@@ -23,8 +32,10 @@ public:
     const parameter& operator[](const ushort index) const;
     const ushort degree;
     const ushort npts;
-    ushort span(const parameter node);
-    ushort mult(const parameter node);
+    const std::vector<parameter> knots;
+    const std::vector<parameter> spans;
+    ushort span(const parameter &node) const;
+    ushort mult(const parameter &node) const;
 };
 
 
@@ -35,5 +46,18 @@ namespace GeneratorKnotVector{
     KnotVector bezier(const ushort degree);
     KnotVector uniform(const ushort degree, const ushort npts);
 };
+
+
+class Basis{
+private:
+    const KnotVector knotvector;
+    const Array<parameter> spectre;
+public:
+    Basis(const KnotVector &knotvector);
+    ~Basis() = default;
+    parameter operator()(parameter node, const ushort index) const;
+    void evaluate(parameter node, std::vector<parameter> output) const;
+};
+
 
 #endif
