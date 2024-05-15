@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-#include "nurbs.hpp"
+#include "cshape/nurbs.h"
 
 typedef double parameter;
 typedef unsigned short ushort;

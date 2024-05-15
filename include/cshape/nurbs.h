@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef NURBS_H
 #define NURBS_H
 
