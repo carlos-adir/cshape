@@ -296,7 +296,7 @@ parameter Basis::operator()(parameter node, const ushort index) const
     return result;
 };
 
-void Basis::evaluate(parameter node, std::vector<parameter> output) const
+void Basis::evaluate(parameter node, std::vector<parameter> &output) const
 {
     if (output.size() != knotvector.npts)
         throw std::invalid_argument("Given results vector lenght is invalid");
