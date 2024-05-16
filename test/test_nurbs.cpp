@@ -205,9 +205,44 @@ TEST(BasisEvalTest, Bezier0)
     const KnotVector knotvector({0, 1});
     const Basis basis(knotvector);
 
-    EXPECT_NEAR(basis(0.0, 0), 1., tolerance);
-    EXPECT_NEAR(basis(0.5, 0), 1., tolerance);
-    EXPECT_NEAR(basis(1.0, 0), 1., tolerance);
+    EXPECT_EQ(knotvector.degree, 0);
+    EXPECT_EQ(knotvector.npts, 1);
+    EXPECT_NEAR(basis(0.0, 0), 1.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 0), 1.0, tolerance);
+    EXPECT_NEAR(basis(1.0, 0), 1.0, tolerance);
+}
+
+TEST(BasisEvalTest, Bezier1)
+{
+    const double tolerance = 1e-15;
+    const KnotVector knotvector({0, 0, 1, 1});
+    const Basis basis(knotvector);
+
+    EXPECT_EQ(knotvector.degree, 1);
+    EXPECT_EQ(knotvector.npts, 2);
+    EXPECT_NEAR(basis(0.0, 0), 1.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 0), 0.5, tolerance);
+    EXPECT_NEAR(basis(1.0, 0), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.0, 1), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 1), 0.5, tolerance);
+    EXPECT_NEAR(basis(1.0, 1), 1.0, tolerance);
+}
+
+TEST(BasisEvalTest, Bezier2)
+{
+    const double tolerance = 1e-15;
+    const KnotVector knotvector({0, 0, 0, 1, 1, 1});
+    const Basis basis(knotvector);
+
+    EXPECT_NEAR(basis(0.0, 0), 1.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 0), 0.25, tolerance);
+    EXPECT_NEAR(basis(1.0, 0), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.0, 1), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 1), 0.5, tolerance);
+    EXPECT_NEAR(basis(1.0, 1), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.0, 2), 0.0, tolerance);
+    EXPECT_NEAR(basis(0.5, 2), 0.25, tolerance);
+    EXPECT_NEAR(basis(1.0, 2), 1.0, tolerance);
 }
 
 TEST(BasisEvalTest, Custom1)
@@ -284,7 +319,7 @@ TEST(BasisEvalTest, Custom1)
     EXPECT_NEAR(basis(1., 6), 1., tolerance);
 }
 
-void test_eval_vector()
+TEST(BasisEvalTest, Custom2)
 {
     const double tolerance = 1e-15;
     const unsigned short degree = 4;
@@ -294,9 +329,9 @@ void test_eval_vector()
     const Basis basis(knotvector);
 
     std::vector<double> output(npts);
-    std::vector<double> results = {0., 1. / 32768, 2913. / 32768, 3039. / 8192, 15297. / 32768, 2401. / 32768, 0.};
+    std::vector<double> expected = {0., 1. / 32768, 2913. / 32768, 3039. / 8192, 15297. / 32768, 2401. / 32768, 0.};
 
     basis.evaluate(5. / 8, output);
     for (unsigned short i = 0; i < npts; i++)
-        EXPECT_NEAR(output[i], results[i], tolerance);
+        EXPECT_NEAR(output[i], expected[i], tolerance);
 }
