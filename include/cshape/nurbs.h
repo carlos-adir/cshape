@@ -9,29 +9,30 @@
 typedef double parameter;
 typedef unsigned short ushort;
 
-
 template <typename T>
-class Array {
+class Array
+{
 private:
     std::vector<T> data;
+
 public:
     Array(const std::vector<ushort> inshape);
     ~Array() = default;
-    const T& operator[](const std::vector<ushort> indexs) const;
-    T& operator[](const std::vector<ushort> indexs);
+    const T &operator[](const std::vector<ushort> indexs) const;
+    T &operator[](const std::vector<ushort> indexs);
     const ushort ndim;
     const std::vector<ushort> shape;
 };
-
 
 class KnotVector
 {
 private:
     const std::vector<parameter> internal;
+
 public:
     KnotVector(const std::vector<parameter> &init_vector);
     ~KnotVector() = default;
-    const parameter& operator[](const ushort index) const;
+    const parameter &operator[](const ushort index) const;
     const ushort degree;
     const ushort npts;
     const std::vector<parameter> knots;
@@ -40,26 +41,25 @@ public:
     ushort mult(const parameter &node) const;
 };
 
+std::ostream &operator<<(std::ostream &os, const KnotVector &knotvector);
 
-std::ostream& operator<<(std::ostream &os, const KnotVector & knotvector);
-
-
-namespace GeneratorKnotVector{
+namespace GeneratorKnotVector
+{
     KnotVector bezier(const ushort degree);
     KnotVector uniform(const ushort degree, const ushort npts);
 };
 
-
-class Basis{
+class Basis
+{
 private:
     const KnotVector knotvector;
     const Array<parameter> spectre;
+
 public:
     Basis(const KnotVector &knotvector);
     ~Basis() = default;
     parameter operator()(parameter node, const ushort index) const;
-    void evaluate(parameter node, std::vector<parameter> output) const;
+    void evaluate(parameter node, std::vector<parameter> &output) const;
 };
-
 
 #endif
