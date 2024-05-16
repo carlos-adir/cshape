@@ -322,4 +322,21 @@ void Basis::evaluate(parameter node, std::vector<parameter> &output) const
     }
 };
 
+Point::Point(const coordinate &x, const coordinate &y) : x(x),
+                                                         y(y){};
+
+const coordinate &Point::operator[](const ushort &index) const
+{
+    return index % 2 ? this->y : this->x;
+};
+
+coordinate Point::inner(const Point &other) const
+{
+    return this->x * other.x + this->y * other.y;
+}
+coordinate Point::cross(const Point &other) const
+{
+    return this->x * other.y - this->y * other.x;
+}
+
 template class Array<parameter>;

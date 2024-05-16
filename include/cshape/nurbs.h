@@ -7,6 +7,7 @@
 #include <vector>
 
 typedef double parameter;
+typedef double coordinate;
 typedef unsigned short ushort;
 
 template <typename T>
@@ -22,6 +23,19 @@ public:
     T &operator[](const std::vector<ushort> indexs);
     const ushort ndim;
     const std::vector<ushort> shape;
+};
+
+class Point
+{
+public:
+    const coordinate x, y;
+    Point(const coordinate &x, const coordinate &y);
+    ~Point() = default;
+    coordinate inner(const Point &other) const;
+    coordinate cross(const Point &other) const;
+    void move(const coordinate &dx, const coordinate &dy);
+    void move(const Point &other);
+    const coordinate &operator[](const ushort &index) const;
 };
 
 class KnotVector
