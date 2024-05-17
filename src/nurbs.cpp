@@ -44,6 +44,15 @@ std::vector<parameter> find_spans(const std::vector<parameter> &init_vector)
     return spans;
 }
 
+template <typename T>
+std::vector<T> ones(const ushort &size)
+{
+    std::vector<T> retorno(size);
+    for (ushort i = 0; i < size; i++)
+        retorno[i] = 1;
+    return retorno;
+}
+
 unsigned multiply(const std::vector<ushort> terms)
 {
     unsigned prod = 1;
@@ -269,59 +278,55 @@ Array<parameter> compute_spectre(const KnotVector &knotvector, const ushort reqd
     return spectre;
 }
 
-Basis::Basis(const KnotVector &knotvector) : knotvector(knotvector),
-                                             spectre(compute_spectre(knotvector, knotvector.degree)){};
+Curve::Curve(const KnotVector &knotvector,
+             const std::vector<coordinate> xcoords,
+             const std::vector<coordinate> ycoords) : knotvector(knotvector),
+                                                      spectre(compute_spectre(knotvector, knotvector.degree)),
+                                                      xcoords(xcoords),
+                                                      ycoords(ycoords),
+                                                      weights(ones<coordinate>(knotvector.npts)){};
 
-parameter Basis::operator()(parameter node, const ushort index) const
+Curve::Curve(const KnotVector &knotvector,
+             const std::vector<coordinate> xcoords,
+             const std::vector<coordinate> ycoords,
+             const std::vector<coordinate> weights) : knotvector(knotvector),
+                                                      spectre(compute_spectre(knotvector, knotvector.degree)),
+                                                      xcoords(xcoords),
+                                                      ycoords(ycoords),
+                                                      weights(weights){};
+
+Point Curve::operator()(parameter node) const
 {
     const ushort span = knotvector.span(node);
-    const ushort func_index = index + knotvector.degree - span;
-
-    if (knotvector.degree < func_index)
-        return 0;
-
+    const bool rational = weights.size();
+    ushort span_index = 0;
+    parameter xcoord = 0;
+    parameter ycoord = 0;
+    parameter weight = 0;
     node -= knotvector[span];
     node /= knotvector[span + 1] - knotvector[span];
-
-    ushort span_index = 0;
     while (knotvector.spans[span_index] != span)
         span_index++;
-
-    parameter result = 0;
-    for (ushort k = knotvector.degree; k <= knotvector.degree; k--)
+    ushort index = span - knotvector.degree;
+    for (ushort func_index = 0; func_index <= knotvector.degree; func_index++)
     {
-        result *= node;
-        result += spectre[{span_index, func_index, k}];
-    }
-    return result;
-};
-
-void Basis::evaluate(parameter node, std::vector<parameter> &output) const
-{
-    if (output.size() != knotvector.npts)
-        throw std::invalid_argument("Given results vector lenght is invalid");
-    for (ushort index = 0; index < knotvector.npts; index++)
-        output[index] = 0; // Clean output vector
-
-    const ushort span = knotvector.span(node);
-    node -= knotvector[span];
-    node /= knotvector[span + 1] - knotvector[span];
-
-    ushort span_index = 0;
-    while (knotvector.spans[span_index] != span)
-        span_index++;
-    ushort func_index = 0;
-    for (ushort index = span - knotvector.degree; index <= span; index++)
-    {
+        parameter output = 0;
         for (ushort k = knotvector.degree; k <= knotvector.degree; k--)
         {
-            output[index] *= node;
-            output[index] += spectre[{span_index, func_index, k}];
+            output *= node;
+            output += spectre[{span_index, func_index, k}];
         }
-        func_index++;
+        weight += output * weights[index];
+        xcoord += output * weights[index] * xcoords[index];
+        ycoord += output * weights[index] * ycoords[index];
+        index++;
     }
+    xcoord /= weight;
+    ycoord /= weight;
+    return Point(xcoord, ycoord);
 };
 
+Point::Point() : x(0), y(0){};
 Point::Point(const coordinate &x, const coordinate &y) : x(x),
                                                          y(y){};
 

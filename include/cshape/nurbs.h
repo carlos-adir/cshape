@@ -29,6 +29,7 @@ class Point
 {
 public:
     const coordinate x, y;
+    Point();
     Point(const coordinate &x, const coordinate &y);
     ~Point() = default;
     coordinate inner(const Point &other) const;
@@ -63,17 +64,25 @@ namespace GeneratorKnotVector
     KnotVector uniform(const ushort degree, const ushort npts);
 };
 
-class Basis
+class Curve
 {
 private:
     const KnotVector knotvector;
     const Array<parameter> spectre;
+    const std::vector<coordinate> xcoords;
+    const std::vector<coordinate> ycoords;
+    const std::vector<coordinate> weights;
 
 public:
-    Basis(const KnotVector &knotvector);
-    ~Basis() = default;
-    parameter operator()(parameter node, const ushort index) const;
-    void evaluate(parameter node, std::vector<parameter> &output) const;
+    Curve(const KnotVector &knotvector,
+          const std::vector<coordinate> xcoords,
+          const std::vector<coordinate> ycoords);
+    Curve(const KnotVector &knotvector,
+          const std::vector<coordinate> xcoords,
+          const std::vector<coordinate> ycoords,
+          const std::vector<coordinate> weights);
+    ~Curve() = default;
+    Point operator()(parameter node) const;
 };
 
 #endif
