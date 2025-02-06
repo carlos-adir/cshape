@@ -1,7 +1,7 @@
 .PHONY: BUILD TEST
 .SILENT:
 
-all: compile check
+test: clean compile check
 
 compile:
 	cmake -S . -B build
@@ -14,4 +14,6 @@ run:
 	cd build/example && ./main
 
 clean:
-	rm -r build/
+	@if test -d build/; then \
+        rm -rf build/; \
+    fi

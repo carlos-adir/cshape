@@ -1,6 +1,6 @@
 project(CShape)
 
-add_library(cshape SHARED nurbs.cpp)
+add_library(cshape SHARED parameter.cpp coordinate.cpp analytic.cpp polynomial.cpp)
 
 target_include_directories(cshape
     PUBLIC
