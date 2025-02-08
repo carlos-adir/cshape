@@ -9,7 +9,7 @@ class Polynomial : public LinearAnalytic<I, O>{
 
 public:
 
-    Polynomial(const O value = 0);
+    explicit Polynomial(const O value = 0);
     Polynomial(const std::vector<O> &coefs);
     Polynomial(const std::initializer_list<O> &coefs);
 
@@ -33,11 +33,5 @@ std::ostream &operator<<(std::ostream &os, const Polynomial<I, O> &poly);
 
 
 template class Polynomial<int, int>;
-template class Polynomial<int, float>;
-template class Polynomial<int, double>;
-template class Polynomial<float, float>;
-template class Polynomial<float, double>;
-template class Polynomial<double, float>;
-template class Polynomial<double, double>;
 
 #endif

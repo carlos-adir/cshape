@@ -17,7 +17,21 @@ class IAnalytic{
 
 public:
     O eval(const I node, const uint1 deriv = 0) const;
-    // O operator()(const I node) const {return this->eval(node);};
+
+    // virtual IAnalytic<I, O> &operator=(const std::initializer_list<O> &coefs);
+
+    // virtual IAnalytic<I, O> &operator=(const O other);
+    // virtual IAnalytic<I, O> &operator+=(const O other);
+    // virtual IAnalytic<I, O> &operator-=(const O other);
+    // virtual IAnalytic<I, O> &operator*=(const O other);
+    // virtual IAnalytic<I, O> &operator/=(const O other);
+    // virtual IAnalytic<I, O> &operator%=(const O other);
+
+    // virtual IAnalytic<I, O> &operator=(const IAnalytic<I, O> &other);
+    // virtual IAnalytic<I, O> &operator+=(const IAnalytic<I, O> &other);
+    // virtual IAnalytic<I, O> &operator-=(const IAnalytic<I, O> &other);
+    
+
 };
 
 template<typename I, typename O>
@@ -28,52 +42,54 @@ private:
     void clean();
 
 public:
-    LinearAnalytic(const O constant = 0);
+    explicit LinearAnalytic(const O constant = 0);
     LinearAnalytic(const std::vector<O> &coefs);
     LinearAnalytic(const std::initializer_list<O> &coefs);
 
-    const O operator[](const uint1 index) const;  // getter
-    O &operator[](const uint1 index); // setter
+    virtual const O operator[](const uint1 index) const final;  // getter
+    virtual O &operator[](const uint1 index) final; // setter
     
-    bool operator==(const O other) const;
-    bool operator!=(const O other) const;
-    bool operator==(const LinearAnalytic<I, O> &other) const;
-    bool operator!=(const LinearAnalytic<I, O> &other) const;
+    virtual bool operator==(const O other) const final;
+    virtual bool operator!=(const O other) const final;
+    virtual bool operator==(const LinearAnalytic<I, O> &other) const final;
+    virtual bool operator!=(const LinearAnalytic<I, O> &other) const final;
     
-    LinearAnalytic<I, O> &operator=(const O other);
-    LinearAnalytic<I, O> &operator=(const std::initializer_list<O> &coefs);
-    LinearAnalytic<I, O> &operator=(const LinearAnalytic<I, O> &other);
+    virtual LinearAnalytic<I, O> &operator=(const O other) final;
+    virtual LinearAnalytic<I, O> &operator=(const std::initializer_list<O> &coefs) final;
 
-    LinearAnalytic<I, O> &operator+=(const O other);
-    LinearAnalytic<I, O> &operator-=(const O other);
-    LinearAnalytic<I, O> &operator*=(const O other);
-    LinearAnalytic<I, O> &operator/=(const O other);
-    LinearAnalytic<I, O> &operator%=(const O other);
-    LinearAnalytic<I, O> operator+(const O other) const;
-    LinearAnalytic<I, O> operator-(const O other) const;
-    LinearAnalytic<I, O> operator*(const O other) const;
-    LinearAnalytic<I, O> operator/(const O other) const;
-    LinearAnalytic<I, O> operator%(const O other) const;
-    LinearAnalytic<I, O> operator-() const;
+    virtual LinearAnalytic<I, O> &operator+=(const O other) final;
+    virtual LinearAnalytic<I, O> &operator-=(const O other) final;
+    virtual LinearAnalytic<I, O> &operator*=(const O other) final;
+    virtual LinearAnalytic<I, O> &operator/=(const O other) final;
+    virtual LinearAnalytic<I, O> &operator%=(const O other) final;
+    virtual LinearAnalytic<I, O> operator+(const O other) const final;
+    virtual LinearAnalytic<I, O> operator-(const O other) const final;
+    virtual LinearAnalytic<I, O> operator*(const O other) const final;
+    virtual LinearAnalytic<I, O> operator/(const O other) const final;
+    virtual LinearAnalytic<I, O> operator%(const O other) const final;
+    virtual LinearAnalytic<I, O> operator-() const final;
 
     
-    LinearAnalytic<I, O> &operator+=(const LinearAnalytic<I, O> &other);
-    LinearAnalytic<I, O> &operator-=(const LinearAnalytic<I, O> &other);
-    LinearAnalytic<I, O> operator+(const LinearAnalytic<I, O> &other) const;
-    LinearAnalytic<I, O> operator-(const LinearAnalytic<I, O> &other) const;
+    virtual LinearAnalytic<I, O> &operator=(const LinearAnalytic<I, O> &other) final;
+    virtual LinearAnalytic<I, O> &operator+=(const LinearAnalytic<I, O> &other) final;
+    virtual LinearAnalytic<I, O> &operator-=(const LinearAnalytic<I, O> &other) final;
+    virtual LinearAnalytic<I, O> operator+(const LinearAnalytic<I, O> &other) const final;
+    virtual LinearAnalytic<I, O> operator-(const LinearAnalytic<I, O> &other) const final;
     
     uint1 degree() const;
 
-    // template<typename I, typename O>
-    // friend std::ostream &operator<<(std::ostream &os, const LinearAnalytic<I, O> &poly);
-    friend LinearAnalytic<I, O> operator+(const O constant, const LinearAnalytic<I, O> &other) {return other + constant;};
-    friend LinearAnalytic<I, O> operator-(const O constant, const LinearAnalytic<I, O> &other) {return (-other) + constant;};
-    friend LinearAnalytic<I, O> operator*(const O constant, const LinearAnalytic<I, O> &other) {return other * constant;};
+    // virtual LinearAnalytic<I, O> operator+(const O constant, const LinearAnalytic<I, O> &other) const final {return other + constant;};
+    // virtual LinearAnalytic<I, O> operator-(const O constant, const LinearAnalytic<I, O> &other) const final {return (-other) + constant;};
+    // virtual LinearAnalytic<I, O> operator*(const O constant, const LinearAnalytic<I, O> &other) const final {return other * constant;};
     // template<typename I, typename O>
     // friend LinearAnalytic<I, O> operator-(const O constant, const LinearAnalytic<I, O> &other);
     // template<typename I, typename O>
     // friend LinearAnalytic<I, O> operator*(const O constant, const LinearAnalytic<I, O> &other);
 };
+
+template<typename I, typename O>
+std::ostream &operator<<(std::ostream &os, const LinearAnalytic<I, O> &poly);
+    
 
 
 // template<typename I, typename O>
@@ -87,19 +103,7 @@ public:
 
 
 template class IAnalytic<int, int>;
-template class IAnalytic<int, float>;
-template class IAnalytic<int, double>;
-template class IAnalytic<float, float>;
-template class IAnalytic<float, double>;
-template class IAnalytic<double, float>;
-template class IAnalytic<double, double>;
 template class LinearAnalytic<int, int>;
-template class LinearAnalytic<int, float>;
-template class LinearAnalytic<int, double>;
-template class LinearAnalytic<float, float>;
-template class LinearAnalytic<float, double>;
-template class LinearAnalytic<double, float>;
-template class LinearAnalytic<double, double>;
 
 // template LinearAnalytic<int, int> operator+(const int constant, const LinearAnalytic<int, int> &other);
 // template LinearAnalytic<int, int> operator-(const int constant, const LinearAnalytic<int, int> &other);

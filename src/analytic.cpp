@@ -3,8 +3,80 @@
 #include <stdexcept>
 #include "cshape/analytic.h"
 
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator=(const std::initializer_list<O> &coefs){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator+=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator-=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator*=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator/=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator%=(const O other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator=(const IAnalytic<I, O> &other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator+=(const IAnalytic<I, O> &other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+// template<typename I, typename O>
+// IAnalytic<I, O> &IAnalytic<I, O>::operator-=(const IAnalytic<I, O> &other){
+//     throw std::invalid_argument("Needs implementation");
+// };
+
+//
+//
+//
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 template<typename I, typename O>
 LinearAnalytic<I, O>::LinearAnalytic(const O constant){
+    std::cout << "LinearAnalytic constant construction with " << constant << std::endl;
     this->resize(1);
     this->internal[0] = constant;
 };
@@ -36,8 +108,10 @@ LinearAnalytic<I, O>::LinearAnalytic(const std::initializer_list<O> &coefs){
 template<typename I, typename O>
 void LinearAnalytic<I, O>::resize(const uint1 newsize){
     const uint1 oldsize = this->internal.size();
-    if (!newsize) throw std::invalid_argument("Received size = 0 inside resize, at least 1 required");
-    if (newsize > MAXSIZE) throw std::invalid_argument("Received size > MAXSIZE");
+    if (!newsize)
+        throw std::invalid_argument("Received size = 0 inside resize, at least 1 required");
+    if (newsize > MAXSIZE)
+        throw std::invalid_argument("Received size > MAXSIZE");
     this->internal.resize(newsize);
     if (oldsize < newsize)
         for(uint1 i = oldsize; i < newsize; i++)
@@ -148,18 +222,21 @@ LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator=(const LinearAnalytic<I, O>
 
 template<typename I, typename O>
 LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator+=(const O other){
+    std::cout << "LinAna (" << *this << ") += O (" << other << ")" << std::endl;
     this->internal[0] += other;
     return *this;
 };
 
 template<typename I, typename O>
 LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator-=(const O other){
+    std::cout << "LinAna (" << *this << ") -= O (" << other << ")" << std::endl;
     this->internal[0] -= other;
     return *this;
 };
 
 template<typename I, typename O>
 LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator*=(const O other){
+    std::cout << "LinAna (" << *this << ") *= O (" << other << ")" << std::endl;
     for(uint1 i = 0; i < this->internal.size(); i++)
         this->internal[i] *= other;
     return *this;
@@ -167,6 +244,7 @@ LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator*=(const O other){
 
 template<typename I, typename O>
 LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator/=(const O other){
+    std::cout << "LinAna (" << *this << ") /= O (" << other << ")" << std::endl;
     if (other == 0)
         throw std::invalid_argument("Math error: Attempted to divide by zero");
     for(uint1 i = 0; i < this->internal.size(); i++)
@@ -199,6 +277,7 @@ LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator%=(const O other){
 
 template<typename I, typename O>
 LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const O other) const{
+    std::cout << "LinAna (" << *this << ") + O (" << other << ")" << std::endl;
     LinearAnalytic<I, O> newfunc;
     newfunc = *this;
     newfunc.internal[0] += other;
@@ -208,6 +287,7 @@ LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const O other) const{
 
 template<typename I, typename O>
 LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const O other) const{
+    std::cout << "LinAna (" << *this << ") - O (" << other << ")" << std::endl;
     LinearAnalytic<I, O> newfunc;
     newfunc = *this;
     newfunc.internal[0] -= other;
@@ -217,6 +297,7 @@ LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const O other) const{
 
 template<typename I, typename O>
 LinearAnalytic<I, O> LinearAnalytic<I, O>::operator*(const O other) const{
+    std::cout << "LinAna (" << *this << ") * O (" << other << ")" << std::endl;
     LinearAnalytic<I, O> newfunc;
     newfunc = *this;
     newfunc *= other;
@@ -225,6 +306,7 @@ LinearAnalytic<I, O> LinearAnalytic<I, O>::operator*(const O other) const{
 
 template<typename I, typename O>
 LinearAnalytic<I, O> LinearAnalytic<I, O>::operator/(const O other) const{
+    std::cout << "LinAna (" << *this << ") / O (" << other << ")" << std::endl;
     LinearAnalytic<I, O> newfunc;
     newfunc = *this;
     newfunc /= other;
@@ -233,6 +315,7 @@ LinearAnalytic<I, O> LinearAnalytic<I, O>::operator/(const O other) const{
 
 template<typename I, typename O>
 LinearAnalytic<I, O> LinearAnalytic<I, O>::operator%(const O other) const{
+    std::cout << "LinAna (" << *this << ") % O (" << other << ")" << std::endl;
     if (other == 0)
         throw std::invalid_argument("Math error: Attempted to divide by zero");
     return LinearAnalytic<I, O>(0);
@@ -303,7 +386,8 @@ LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const LinearAnalytic<I, O> 
 
 template<typename I, typename O>
 O &LinearAnalytic<I, O>::operator[](const uint1 index){
-    if (this->internal.size() <= index) this->resize(index + 1);
+    if (this->internal.size() <= index)
+        this->resize(index + 1);
     return this->internal[index];
 };
 
@@ -327,15 +411,15 @@ const O LinearAnalytic<I, O>::operator[](const uint1 index) const
 //
 
 
-// template<typename I, typename O>
-// std::ostream &operator<<(std::ostream &os, const LinearAnalytic<I, O> &poly){
-//     const uint1 degree = poly.degree();
-//     os << "LinearAnalytic[";
-//     for (uint1 i = 0; i < degree; i++)
-//         os << poly[i] << ", ";
-//     os << poly[degree] << "]";
-//     return os;
-// };
+template<typename I, typename O>
+std::ostream &operator<<(std::ostream &os, const LinearAnalytic<I, O> &poly){
+    const uint1 degree = poly.degree();
+    os << "LinearAnalytic[";
+    for (uint1 i = 0; i < degree; i++)
+        os << poly[i] << ", ";
+    os << poly[degree] << "]";
+    return os;
+};
 
 // template<typename I, typename O>
 // LinearAnalytic<I, O> operator+(const O constant, const LinearAnalytic<I, O> &other){

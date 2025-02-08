@@ -4,9 +4,13 @@
 #include "cshape/polynomial.h"
 
 template<typename I, typename O>
-Polynomial<I, O>::Polynomial(const O constant) : LinearAnalytic<I, O>(constant){};
+Polynomial<I, O>::Polynomial(const O constant) : LinearAnalytic<I, O>(constant){
+    std::cout << "Polynomial constant construction with " << constant << std::endl;
+};
+
 template<typename I, typename O>
 Polynomial<I, O>::Polynomial(const std::vector<O> &coefs) : LinearAnalytic<I, O>(coefs) {};
+
 template<typename I, typename O>
 Polynomial<I, O>::Polynomial(const std::initializer_list<O> &coefs) : LinearAnalytic<I, O>(coefs) {};
 
@@ -16,6 +20,7 @@ Polynomial<I, O>::Polynomial(const std::initializer_list<O> &coefs) : LinearAnal
 
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator*=(const Polynomial<I, O> &other){
+    std::cout << "Poly (" << *this << ") *= Poly (" << other << ")" << std::endl;
     Polynomial<I, O> outpoly = (*this) * other;
     *this = outpoly;
     return *this;
@@ -23,6 +28,7 @@ Polynomial<I, O> &Polynomial<I, O>::operator*=(const Polynomial<I, O> &other){
 
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator/=(const Polynomial<I, O> &other){
+    std::cout << "Poly (" << *this << ") /= Poly (" << other << ")" << std::endl;
     Polynomial<I, O> outpoly = (*this) / other;
     *this = outpoly;
     return *this;
@@ -31,6 +37,7 @@ Polynomial<I, O> &Polynomial<I, O>::operator/=(const Polynomial<I, O> &other){
 
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator%=(const Polynomial<I, O> &other){
+    std::cout << "Poly (" << *this << ") %= Poly (" << other << ")" << std::endl;
     Polynomial<I, O> outpoly = (*this) % other;
     *this = outpoly;
     return *this;
@@ -38,6 +45,7 @@ Polynomial<I, O> &Polynomial<I, O>::operator%=(const Polynomial<I, O> &other){
 
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator*(const Polynomial<I, O> &other) const{
+    std::cout << "Poly (" << *this << ") * Poly (" << other << ")" << std::endl;
     Polynomial<I, O> outpoly;
     for (uint1 i = 0; i <= this->degree(); i++)
         for (uint1 j = 0; j <= other.degree(); j++)
@@ -46,8 +54,10 @@ Polynomial<I, O> Polynomial<I, O>::operator*(const Polynomial<I, O> &other) cons
 }
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) const{
-    if (other.degree() == 0)
-        return (*this) / other[0];
+    std::cout << "Poly (" << *this << ") / Poly (" << other << ")" << std::endl;
+    if (other.degree() == 0){
+        return this / other[0];
+    }
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
     Polynomial<I, O> quotpoly;
@@ -55,12 +65,14 @@ Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) cons
     residual = *this;
     O ratio;
     for (uint1 r = tdeg; r >= odeg; r--){
+        std::cout << "#";
         ratio = residual[r] / other[odeg];
         quotpoly[r - odeg] = ratio;
         residual[r] = 0;
         for (uint1 i = 0; i < odeg; i++)
             residual[i + r - odeg] -= ratio * other[i];
     }
+    std::cout << std::endl;
     return quotpoly;
 }
 
@@ -71,15 +83,19 @@ Polynomial<I, O> Polynomial<I, O>::operator%(const Polynomial<I, O> &other) cons
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
     Polynomial<I, O> quotpoly;
-    Polynomial<I, O> residual = *this;
+    Polynomial<I, O> residual;
+    residual = *this;
     O ratio;
+    std::cout << "O";
     for (uint1 r = residual.degree(); r >= odeg; r--){
+        std::cout << ".";
         ratio = residual[r] / other[odeg];
         quotpoly[r - odeg] = ratio;
         residual[r] = 0;
         for (uint1 i = 0; i < odeg; i++)
             residual[i + r - odeg] -= ratio * other[i];
     }
+    std::cout << std::endl;
     return residual;
 }
 

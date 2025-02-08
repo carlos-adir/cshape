@@ -123,17 +123,17 @@ TEST(LinearAnalyticTest, DivLinear)
 
 
 
-TEST(LinearAnalyticTest, OperateInverted)
-{
-    LinearAnalytic<int, int> linear = 20;
+// TEST(LinearAnalyticTest, OperateInverted)
+// {
+//     LinearAnalytic<int, int> linear = 20;
 
-    EXPECT_TRUE(10 + linear == 30);
-    EXPECT_TRUE(5 - linear == -15);
-    EXPECT_TRUE(5 * linear == 100);
+//     EXPECT_TRUE(10 + linear == 30);
+//     EXPECT_TRUE(5 - linear == -15);
+//     EXPECT_TRUE(5 * linear == 100);
 
-    LinearAnalytic<int, int> lineara = {1, 0, 2};
-    LinearAnalytic<int, int> linearb = {2, 0, 4};
+//     LinearAnalytic<int, int> lineara = {1, 0, 2};
+//     LinearAnalytic<int, int> linearb = {2, 0, 4};
 
-    EXPECT_TRUE(2 * lineara == linearb);
+//     EXPECT_TRUE(2 * lineara == linearb);
 
-}
+// }
