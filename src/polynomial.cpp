@@ -17,20 +17,14 @@ Polynomial<I, O>::Polynomial(const std::initializer_list<O> &coefs) : LinearAnal
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator*=(const Polynomial<I, O> &other){
     Polynomial<I, O> outpoly = (*this) * other;
-    this->resize(outpoly.size());
-    for (uint1 i = 0; i < outpoly.size(); i++)
-        this->internal[i] = outpoly.internal[i];
-    this->clean();
+    *this = outpoly;
     return *this;
 }
 
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator/=(const Polynomial<I, O> &other){
     Polynomial<I, O> outpoly = (*this) / other;
-    this->resize(outpoly.size());
-    for (uint1 i = 0; i < outpoly.size(); i++)
-        this->internal[i] = outpoly.internal[i];
-    this->clean();
+    *this = outpoly;
     return *this;
 }
 
@@ -38,31 +32,27 @@ Polynomial<I, O> &Polynomial<I, O>::operator/=(const Polynomial<I, O> &other){
 template<typename I, typename O>
 Polynomial<I, O> &Polynomial<I, O>::operator%=(const Polynomial<I, O> &other){
     Polynomial<I, O> outpoly = (*this) % other;
-    this->resize(outpoly.size());
-    for (uint1 i = 0; i < outpoly.size(); i++)
-        this->internal[i] = outpoly.internal[i];
-    this->clean();
+    *this = outpoly;
     return *this;
 }
 
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator*(const Polynomial<I, O> &other) const{
     Polynomial<I, O> outpoly;
-    outpoly.resize(this->size() - 1 + other.size());
-    for (uint1 i = 0; i < this->size(); i++)
-        for (uint1 j = 0; j < other.size(); j++)
-            outpoly.internal[i+j] += this->internal[i] * other[j];
-    outpoly.clean();
+    for (uint1 i = 0; i <= this->degree(); i++)
+        for (uint1 j = 0; j <= other.degree(); j++)
+            outpoly[i+j] += (*this)[i] * other[j];
     return outpoly;
 }
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) const{
-    if (other.size() == 1)
+    if (other.degree() == 0)
         return (*this) / other[0];
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
     Polynomial<I, O> quotpoly;
-    Polynomial<I, O> residual(this->internal);
+    Polynomial<I, O> residual;
+    residual = *this;
     O ratio;
     for (uint1 r = tdeg; r >= odeg; r--){
         ratio = residual[r] / other[odeg];
@@ -71,18 +61,17 @@ Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) cons
         for (uint1 i = 0; i < odeg; i++)
             residual[i + r - odeg] -= ratio * other[i];
     }
-    quotpoly.clean();
     return quotpoly;
 }
 
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator%(const Polynomial<I, O> &other) const{
-    if (other.size() == 1)
+    if (other.degree() == 0)
         return (*this) / other[0];
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
     Polynomial<I, O> quotpoly;
-    Polynomial<I, O> residual(this->internal);
+    Polynomial<I, O> residual = *this;
     O ratio;
     for (uint1 r = residual.degree(); r >= odeg; r--){
         ratio = residual[r] / other[odeg];
@@ -91,7 +80,6 @@ Polynomial<I, O> Polynomial<I, O>::operator%(const Polynomial<I, O> &other) cons
         for (uint1 i = 0; i < odeg; i++)
             residual[i + r - odeg] -= ratio * other[i];
     }
-    residual.clean();
     return residual;
 }
 
@@ -108,10 +96,10 @@ O Polynomial<I, O>::eval(const I node, const uint1 deriv) const{
         deriv_coef = 1;
         for (uint1 j = 0; j < deriv; j++)
             deriv_coef *= i - j;
-        result += deriv_coef * this->internal[i];
+        result += deriv_coef * (*this)[i];
     }
     result *= node;
-    result += this->internal[deriv];
+    result += (*this)[deriv];
     return result;
 }
 

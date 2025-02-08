@@ -20,7 +20,7 @@ public:
     Polynomial operator/(const Polynomial<I, O> &other) const;
     Polynomial operator%(const Polynomial<I, O> &other) const;
 
-    O eval(const I node, const uint1 deriv = 0) const override;
+    O eval(const I node, const uint1 deriv = 0) const;
 //     Coordinate defintegral(const Parameter nodea, const Parameter nodeb) const;
 //     Polynomial derivate(const uint1 times = 1) const;
 //     Polynomial shift(const Parameter amount) const;

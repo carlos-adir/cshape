@@ -16,7 +16,7 @@ template<typename I, typename O>
 class IAnalytic{
 
 public:
-    // O eval(const I node, const uint1 deriv = 0) const;
+    O eval(const I node, const uint1 deriv = 0) const;
     // O operator()(const I node) const {return this->eval(node);};
 };
 
