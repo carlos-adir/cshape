@@ -1,47 +1,43 @@
-
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
-#include "parameter.h"
-#include "coordinate.h"
 #include "analytic.h"
 #include <vector>
 
-
-class Polynomial : public LinearAnalytic{
+template<typename I, typename O>
+class Polynomial : public LinearAnalytic<I, O>{
 
 public:
 
-    Polynomial();
-    template<typename Scalar>
-    Polynomial(const Scalar value);
-    template<typename Scalar>
-    Polynomial(const std::vector<Scalar> &coefs);
-    template<typename Scalar>
-    Polynomial(const std::initializer_list<Scalar> &coefs);
+    Polynomial(const O value = 0);
+    Polynomial(const std::vector<O> &coefs);
+    Polynomial(const std::initializer_list<O> &coefs);
 
+    Polynomial &operator*=(const Polynomial<I, O> &other);
+    Polynomial &operator/=(const Polynomial<I, O> &other);
+    Polynomial &operator%=(const Polynomial<I, O> &other);
+    Polynomial operator*(const Polynomial<I, O> &other) const;
+    Polynomial operator/(const Polynomial<I, O> &other) const;
+    Polynomial operator%(const Polynomial<I, O> &other) const;
 
-    bool operator==(Polynomial const &other) const;
-    bool operator!=(Polynomial const &other) const;
-    Polynomial &operator=(Polynomial const &other);
-    Polynomial &operator+=(Polynomial const &other);
-    Polynomial &operator-=(Polynomial const &other);
-    Polynomial &operator*=(Polynomial const &other);
-    Polynomial &operator/=(Polynomial const &other);
-    Polynomial &operator%=(Polynomial const &other);
-    Polynomial operator+(Polynomial const &other) const;
-    Polynomial operator-(Polynomial const &other) const;
-    Polynomial operator*(Polynomial const &other) const;
-    Polynomial operator/(Polynomial const &other) const;
-    Polynomial operator%(Polynomial const &other) const;
-
-    friend std::ostream &operator<<(std::ostream &os, const Polynomial &poly);
-    template<typename Scalar>
-    Coordinate eval(const Scalar node, const uint1 deriv = 0) const;
+    O eval(const I node, const uint1 deriv = 0) const override;
 //     Coordinate defintegral(const Parameter nodea, const Parameter nodeb) const;
 //     Polynomial derivate(const uint1 times = 1) const;
 //     Polynomial shift(const Parameter amount) const;
 //     Polynomial scale(const Parameter amount) const;
 };
+
+template<typename I, typename O>
+std::ostream &operator<<(std::ostream &os, const Polynomial<I, O> &poly);
+
+
+
+template class Polynomial<int, int>;
+template class Polynomial<int, float>;
+template class Polynomial<int, double>;
+template class Polynomial<float, float>;
+template class Polynomial<float, double>;
+template class Polynomial<double, float>;
+template class Polynomial<double, double>;
 
 #endif
