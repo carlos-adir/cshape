@@ -103,6 +103,16 @@ LinearAnalytic<I, O>::LinearAnalytic(const std::initializer_list<O> &coefs){
 };
 
 
+template<typename I, typename O>
+LinearAnalytic<I, O>::LinearAnalytic(const LinearAnalytic<I, O> &other) {
+    const uint1 osize = other.internal.size();
+    this->resize(osize);
+    for (uint1 i = 0; i < osize; i++)
+        this->internal[i] = other.internal[i];
+    this->clean();
+};
+
+
 
 
 template<typename I, typename O>
@@ -275,60 +285,60 @@ LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator%=(const O other){
 
 
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const O other) const{
-    std::cout << "LinAna (" << *this << ") + O (" << other << ")" << std::endl;
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc.internal[0] += other;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const O other) const{
+//     std::cout << "LinAna (" << *this << ") + O (" << other << ")" << std::endl;
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc.internal[0] += other;
+//     return newfunc;
+// };
 
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const O other) const{
-    std::cout << "LinAna (" << *this << ") - O (" << other << ")" << std::endl;
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc.internal[0] -= other;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const O other) const{
+//     std::cout << "LinAna (" << *this << ") - O (" << other << ")" << std::endl;
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc.internal[0] -= other;
+//     return newfunc;
+// };
 
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator*(const O other) const{
-    std::cout << "LinAna (" << *this << ") * O (" << other << ")" << std::endl;
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc *= other;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator*(const O other) const{
+//     std::cout << "LinAna (" << *this << ") * O (" << other << ")" << std::endl;
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc *= other;
+//     return newfunc;
+// };
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator/(const O other) const{
-    std::cout << "LinAna (" << *this << ") / O (" << other << ")" << std::endl;
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc /= other;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator/(const O other) const{
+//     std::cout << "LinAna (" << *this << ") / O (" << other << ")" << std::endl;
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc /= other;
+//     return newfunc;
+// };
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator%(const O other) const{
-    std::cout << "LinAna (" << *this << ") % O (" << other << ")" << std::endl;
-    if (other == 0)
-        throw std::invalid_argument("Math error: Attempted to divide by zero");
-    return LinearAnalytic<I, O>(0);
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator%(const O other) const{
+//     std::cout << "LinAna (" << *this << ") % O (" << other << ")" << std::endl;
+//     if (other == 0)
+//         throw std::invalid_argument("Math error: Attempted to divide by zero");
+//     return LinearAnalytic<I, O>(0);
+// };
 
 
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-() const{
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc *= -1;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-() const{
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc *= -1;
+//     return newfunc;
+// };
 
 //
 //
@@ -359,20 +369,20 @@ LinearAnalytic<I, O> &LinearAnalytic<I, O>::operator-=(const LinearAnalytic<I, O
         this->internal[i] -= other.internal[i];
     return *this;
 };
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const LinearAnalytic<I, O> &other) const{
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc += other;
-    return newfunc;
-};
-template<typename I, typename O>
-LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const LinearAnalytic<I, O> &other) const{
-    LinearAnalytic<I, O> newfunc;
-    newfunc = *this;
-    newfunc -= other;
-    return newfunc;
-};
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator+(const LinearAnalytic<I, O> &other) const{
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc += other;
+//     return newfunc;
+// };
+// template<typename I, typename O>
+// LinearAnalytic<I, O> LinearAnalytic<I, O>::operator-(const LinearAnalytic<I, O> &other) const{
+//     LinearAnalytic<I, O> newfunc;
+//     newfunc = *this;
+//     newfunc -= other;
+//     return newfunc;
+// };
 
 
 

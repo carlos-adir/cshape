@@ -45,6 +45,7 @@ public:
     explicit LinearAnalytic(const O constant = 0);
     LinearAnalytic(const std::vector<O> &coefs);
     LinearAnalytic(const std::initializer_list<O> &coefs);
+    LinearAnalytic(const LinearAnalytic<I, O> &other);
 
     virtual const O operator[](const uint1 index) const final;  // getter
     virtual O &operator[](const uint1 index) final; // setter
@@ -62,19 +63,19 @@ public:
     virtual LinearAnalytic<I, O> &operator*=(const O other) final;
     virtual LinearAnalytic<I, O> &operator/=(const O other) final;
     virtual LinearAnalytic<I, O> &operator%=(const O other) final;
-    virtual LinearAnalytic<I, O> operator+(const O other) const final;
-    virtual LinearAnalytic<I, O> operator-(const O other) const final;
-    virtual LinearAnalytic<I, O> operator*(const O other) const final;
-    virtual LinearAnalytic<I, O> operator/(const O other) const final;
-    virtual LinearAnalytic<I, O> operator%(const O other) const final;
-    virtual LinearAnalytic<I, O> operator-() const final;
+    // virtual LinearAnalytic<I, O> operator+(const O other) const final;
+    // virtual LinearAnalytic<I, O> operator-(const O other) const final;
+    // virtual LinearAnalytic<I, O> operator*(const O other) const final;
+    // virtual LinearAnalytic<I, O> operator/(const O other) const final;
+    // virtual LinearAnalytic<I, O> operator%(const O other) const final;
+    // virtual LinearAnalytic<I, O> operator-() const final;
 
     
     virtual LinearAnalytic<I, O> &operator=(const LinearAnalytic<I, O> &other) final;
     virtual LinearAnalytic<I, O> &operator+=(const LinearAnalytic<I, O> &other) final;
     virtual LinearAnalytic<I, O> &operator-=(const LinearAnalytic<I, O> &other) final;
-    virtual LinearAnalytic<I, O> operator+(const LinearAnalytic<I, O> &other) const final;
-    virtual LinearAnalytic<I, O> operator-(const LinearAnalytic<I, O> &other) const final;
+    // virtual LinearAnalytic<I, O> operator+(const LinearAnalytic<I, O> &other) const final;
+    // virtual LinearAnalytic<I, O> operator-(const LinearAnalytic<I, O> &other) const final;
     
     uint1 degree() const;
 

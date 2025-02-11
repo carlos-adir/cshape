@@ -12,6 +12,15 @@ public:
     explicit Polynomial(const O value = 0);
     Polynomial(const std::vector<O> &coefs);
     Polynomial(const std::initializer_list<O> &coefs);
+    Polynomial(const Polynomial<I, O> &other);
+
+    
+    using LinearAnalytic<I, O>::operator=;
+    using LinearAnalytic<I, O>::operator+=;
+    using LinearAnalytic<I, O>::operator-=;
+    using LinearAnalytic<I, O>::operator*=;
+    using LinearAnalytic<I, O>::operator/=;
+    using LinearAnalytic<I, O>::operator%=;
 
     Polynomial &operator*=(const Polynomial<I, O> &other);
     Polynomial &operator/=(const Polynomial<I, O> &other);

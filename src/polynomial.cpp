@@ -14,6 +14,12 @@ Polynomial<I, O>::Polynomial(const std::vector<O> &coefs) : LinearAnalytic<I, O>
 template<typename I, typename O>
 Polynomial<I, O>::Polynomial(const std::initializer_list<O> &coefs) : LinearAnalytic<I, O>(coefs) {};
 
+template<typename I, typename O>
+Polynomial<I, O>::Polynomial(const Polynomial &other) : LinearAnalytic<I, O>(0) {
+    const uint1 odegree = other.degree();
+    for (uint1 i = 0; i <= odegree; i++)
+        (*this)[i] = other[i];
+};
 
 
 
@@ -56,7 +62,9 @@ template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) const{
     std::cout << "Poly (" << *this << ") / Poly (" << other << ")" << std::endl;
     if (other.degree() == 0){
-        return this / other[0];
+        Polynomial<I, O> newpoly = *this;
+        newpoly /= other[0];
+        return newpoly;
     }
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
@@ -78,8 +86,11 @@ Polynomial<I, O> Polynomial<I, O>::operator/(const Polynomial<I, O> &other) cons
 
 template<typename I, typename O>
 Polynomial<I, O> Polynomial<I, O>::operator%(const Polynomial<I, O> &other) const{
-    if (other.degree() == 0)
-        return (*this) / other[0];
+    if (other.degree() == 0){
+        Polynomial<I, O> newpoly = *this;
+        newpoly /= other[0];
+        return newpoly;
+    }
     const uint1 tdeg = this->degree();
     const uint1 odeg = other.degree();
     Polynomial<I, O> quotpoly;
