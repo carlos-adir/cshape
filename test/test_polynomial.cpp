@@ -111,6 +111,9 @@ TEST(PolynomialTest, OperateConstant)
     EXPECT_TRUE(poly * 5 == 50);
     EXPECT_TRUE(poly / 2 == 5);
     EXPECT_TRUE(poly % 3 == 0);
+    EXPECT_TRUE(10 + poly == 20);
+    EXPECT_TRUE(5 - poly == -5);
+    EXPECT_TRUE(5 * poly == 50);
 }
 
 
