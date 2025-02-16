@@ -11,6 +11,8 @@ typedef unsigned int uint4;
 typedef unsigned short uint2;
 typedef unsigned short uint1;
 
+typedef double basetype;
+
 class SubSetRealLine;
 class EmptyParam;
 class SingleValue;
@@ -27,8 +29,6 @@ public:
     virtual bool operator!=(const SubSetRealLine &other) const = 0;
     virtual bool contains(const SubSetRealLine &other) const = 0;
 };
-
-
 
 
 class EmptyParam : public SubSetRealLine {
@@ -93,6 +93,12 @@ public:
     virtual bool operator==(const SingleValue &other) const = 0;
     virtual bool operator!=(const SingleValue &other) const = 0;
 
+    virtual SingleValue &operator+(const SingleValue &other) const = 0;
+    virtual SingleValue &operator-(const SingleValue &other) const = 0;
+    virtual SingleValue &operator*(const SingleValue &other) const = 0;
+    virtual SingleValue &operator/(const SingleValue &other) const = 0;
+    
+
     bool contains(const SubSetRealLine &other) const final;
 
     friend std::ostream &operator<< (std::ostream &os, const SingleValue &value);
@@ -126,6 +132,11 @@ public:
     bool operator>=(const SingleValue &other) const final;
     bool operator>(const SingleValue &other) const final;
 
+    SingleValue &operator+(const SingleValue &other) const final;
+    SingleValue &operator-(const SingleValue &other) const final;
+    SingleValue &operator*(const SingleValue &other) const final;
+    SingleValue &operator/(const SingleValue &other) const final;
+
     friend std::ostream &operator<< (std::ostream &os, const NegativeInfinity &value);
 };
 
@@ -154,6 +165,11 @@ public:
     bool operator<=(const SingleValue &other) const final;
     bool operator>=(const SingleValue &other) const final;
     bool operator>(const SingleValue &other) const final;
+
+    SingleValue &operator+(const SingleValue &other) const final;
+    SingleValue &operator-(const SingleValue &other) const final;
+    SingleValue &operator*(const SingleValue &other) const final;
+    SingleValue &operator/(const SingleValue &other) const final;
     
     friend std::ostream &operator<< (std::ostream &os, const PositiveInfinity &value);
 };
@@ -161,11 +177,11 @@ public:
 
 class FiniteSingleValue : public SingleValue {
 private:
-    const double *internal;
+    const basetype *internal;
 
 public:
-    FiniteSingleValue(const double *value);
-    FiniteSingleValue(const double &value);
+    FiniteSingleValue(const basetype *value);
+    FiniteSingleValue(const basetype &value);
     
     using SingleValue::operator==;
     using SingleValue::operator!=;
@@ -176,6 +192,11 @@ public:
     bool operator>(const SingleValue &other) const final;
     bool operator==(const SingleValue &other) const final;
     bool operator!=(const SingleValue &other) const final;
+
+    SingleValue &operator+(const SingleValue &other) const final;
+    SingleValue &operator-(const SingleValue &other) const final;
+    SingleValue &operator*(const SingleValue &other) const final;
+    SingleValue &operator/(const SingleValue &other) const final;
 
     friend std::ostream &operator<< (std::ostream &os, const FiniteSingleValue &other);
 };
@@ -191,7 +212,6 @@ public:
     bool operator!=(const SubSetRealLine &other) const final;
     virtual bool operator==(const Interval &other) const final;
     virtual bool operator!=(const Interval &other) const final;
-
 
     bool contains(const SubSetRealLine &other) const final;
 
@@ -230,9 +250,9 @@ static const WholeParam& WHOLE = WholeParam::getInstance();
 //
 //
 
-FiniteSingleValue::FiniteSingleValue(const double *value)
+FiniteSingleValue::FiniteSingleValue(const basetype *value)
     : internal(value) {};
-FiniteSingleValue::FiniteSingleValue(const double &value)
+FiniteSingleValue::FiniteSingleValue(const basetype &value)
     : FiniteSingleValue(&value) {};
 
 
@@ -473,6 +493,109 @@ bool FiniteSingleValue::operator>(const SingleValue &other) const {
     return *internal > *finite->internal;
 };
 
+
+
+
+//
+//
+//
+//  SINGLE VALUE MATH OPERATIONS
+//
+//
+//
+
+SingleValue &NegativeInfinity::operator+(const SingleValue &other) const{
+    if(dynamic_cast<const PositiveInfinity*>(&other))
+        throw std::invalid_argument("Cannot add (-inf) with (+inf)");
+    return BOTINF;
+}
+SingleValue &NegativeInfinity::operator-(const SingleValue &other) const{
+    if(dynamic_cast<const NegativeInfinity*>(&other))
+        throw std::invalid_argument("Cannot sub (-inf) by (-inf)");
+    return BOTINF;
+}
+SingleValue &NegativeInfinity::operator*(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite)
+        if(dynamic_cast<const PositiveInfinity*>(&other))
+            return BOTINF;
+        else if(dynamic_cast<const NegativeInfinity*>(&other))
+            return TOPINF;
+    if (!(*finite)) return *finite;
+    if (*finite < 0) return TOPINF;
+    if (*finite > 0) return BOTINF;
+    throw std::runtime_error("Not expected get here");
+}
+SingleValue &NegativeInfinity::operator/(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite)
+        throw std::invalid_argument("Cannot divide (-inf) but any infinity value");
+    if (!(*finite))
+        throw std::invalid_argument("Cannot divide (-inf) by 0");
+    if (*finite < 0) return TOPINF;
+    if (*finite > 0) return BOTINF;
+    throw std::runtime_error("Not expected get here");
+}
+
+
+
+
+SingleValue &PositiveInfinity::operator+(const SingleValue &other) const{
+    if(dynamic_cast<const NegativeInfinity*>(&other))
+        throw std::invalid_argument("Cannot add (+inf) with (-inf)");
+    return TOPINF;
+}
+SingleValue &PositiveInfinity::operator-(const SingleValue &other) const{
+    if(dynamic_cast<const PositiveInfinity*>(&other))
+        throw std::invalid_argument("Cannot sub (+inf) by (+inf)");
+    return TOPINF;
+}
+SingleValue &PositiveInfinity::operator*(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite)
+        if(dynamic_cast<const PositiveInfinity*>(&other))
+            return TOPINF;
+        else if(dynamic_cast<const NegativeInfinity*>(&other))
+            return BOTINF;
+    if (*finite == 0) return *finite;
+    if (*finite < 0) return BOTINF;
+    if (*finite > 0) return TOPINF;
+    throw std::runtime_error("Not expected get here");
+}
+SingleValue &PositiveInfinity::operator/(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite)
+        throw std::invalid_argument("Cannot divide (-inf) but any infinity value");
+    if (*finite == 0)
+        throw std::invalid_argument("Cannot divide (-inf) by 0");
+    if (*finite < 0) return BOTINF;
+    if (*finite > 0) return TOPINF;
+    throw std::runtime_error("Not expected get here");
+}
+
+
+
+
+SingleValue &FiniteSingleValue::operator+(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite) return other.operator+(*this);
+    return this->operator+(*finite);
+}
+SingleValue &FiniteSingleValue::operator-(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite) return (-other).operator+(*this);
+    return this->operator-(*finite);
+}
+SingleValue &FiniteSingleValue::operator*(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite) return other.operator*(*this);
+    return this->operator*(*finite);
+}
+SingleValue &FiniteSingleValue::operator/(const SingleValue &other) const{
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
+    if (!finite) return FiniteSingleValue(0);
+    return this->operator/(*finite);
+}
 
 // 
 //
