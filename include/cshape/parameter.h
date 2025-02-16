@@ -16,8 +16,7 @@ class EmptyParam;
 class SingleValue;
 class WholeParam;
 class Interval;
-class UnionSubsets;
-template <typename T>
+class UnionSubSets;
 class FiniteSingleValue;
 class NegativeInfinity;
 class PositiveInfinity;
@@ -27,10 +26,6 @@ public:
     virtual bool operator==(const SubSetRealLine &other) const = 0;
     virtual bool operator!=(const SubSetRealLine &other) const = 0;
     virtual bool contains(const SubSetRealLine &other) const = 0;
-
-    // virtual SubSetRealLine &operator~() const = 0;
-    // virtual SubSetRealLine &operator|(const SubSetRealLine &other) const = 0;
-    // virtual SubSetRealLine &operator&(const SubSetRealLine &other) const = 0;
 };
 
 
@@ -63,12 +58,7 @@ public:
         return dynamic_cast<const EmptyParam*>(&other);
     };
 
-    // SubSetRealLine &operator~() const final;
-
-    friend std::ostream &operator<< (std::ostream &os, const EmptyParam &value){
-        os << "{}";
-        return os;
-    };
+    friend std::ostream &operator<< (std::ostream &os, const EmptyParam &value);
 };
 
 
@@ -99,10 +89,7 @@ public:
         return true;
     };
 
-    friend std::ostream &operator<< (std::ostream &os, const WholeParam &value){
-        os << "(-inf, +inf)";
-        return os;
-    };
+    friend std::ostream &operator<< (std::ostream &os, const WholeParam &value);
 };
 
 
@@ -133,10 +120,7 @@ public:
         return *this == *single;
     };
 
-    friend std::ostream &operator<< (std::ostream &os, const SingleValue &value){
-        os << "SingleValue(X)";
-        return os;
-    }
+    friend std::ostream &operator<< (std::ostream &os, const SingleValue &value);
 };
 
     
@@ -175,10 +159,7 @@ public:
     };
     bool operator>(const SingleValue &other) const final {return false;};
 
-    friend std::ostream &operator<< (std::ostream &os, const NegativeInfinity &value){
-        os << "-inf";
-        return os;
-    }
+    friend std::ostream &operator<< (std::ostream &os, const NegativeInfinity &value);
 };
 
 class PositiveInfinity : public SingleValue {
@@ -215,20 +196,16 @@ public:
         return !dynamic_cast<const PositiveInfinity*>(&other);
     };
     
-    friend std::ostream &operator<< (std::ostream &os, const PositiveInfinity &value){
-        os << "+inf";
-        return os;
-    }
+    friend std::ostream &operator<< (std::ostream &os, const PositiveInfinity &value);
 };
 
 
-template <typename T>
 class FiniteSingleValue : public SingleValue {
 private:
-    const T *internal;
+    const double *internal;
 
 public:
-    FiniteSingleValue(const T *value) : internal(value) {};
+    FiniteSingleValue(const double *value) : internal(value) {};
     
     using SingleValue::operator==;
     using SingleValue::operator!=;
@@ -283,14 +260,14 @@ public:
         const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&other);
         return *internal != *finite->internal;
     };
+
+    friend std::ostream &operator<< (std::ostream &os, const FiniteSingleValue &other);
 };
 
 class Interval : public SubSetRealLine {
-private:
-    const SingleValue *start, *end;
-
 public:
-    Interval(const SingleValue *start, const SingleValue *end) : start(start), end(end){};
+    const SingleValue *start, *end;
+    Interval(const SingleValue *start, const SingleValue *end);
 
     bool operator==(const SubSetRealLine &other) const final {
         const Interval *interval = dynamic_cast<const Interval*>(&other);
@@ -308,54 +285,40 @@ public:
     };
 
 
-    bool contains(const SubSetRealLine &other) const final {
-        const SingleValue *single = dynamic_cast<const SingleValue*>(&other);
-        if (single)
-            return *start <= *single && *single <= *end;
-        const Interval *interval = dynamic_cast<const Interval*>(&other);
-        if (interval)
-            return *start <= *interval->start && *interval->end <= *end;
-        const UnionSubsets *unionsets = dynamic_cast<const UnionSubsets*>(&other);
-        if (unionsets){
-            // for(uint1 i = 0; i < unionsets->singles.size(); i++){
-            //     const SingleValue *single = unionsets->singles[i];
-            //     if (*single < *this->start || *this->end < *single)
-            //         return false;
-            // }
-            // for(uint1 i = 0; i < unionsets->intervals.size(); i++){
-            //     const Interval *interval = unionsets->intervals[i];
-            //     if (*interval->start < *this->start || *this->end < *interval->end)
-            //         return false;
-            // }
-            return true;
-        }
-        return dynamic_cast<const EmptyParam*>(&other);
-    };
+    bool contains(const SubSetRealLine &other) const final;
+
+    friend std::ostream &operator<< (std::ostream &os, const Interval &value);
 };
 
-
-class UnionSubsets : public SubSetRealLine {
+class UnionSubSets : public SubSetRealLine {
 public:
-    std::vector<SingleValue*> singles;
-    std::vector<Interval*> intervals;
+    const std::vector<FiniteSingleValue*> singles;
+    const std::vector<Interval*> intervals;
+
+    UnionSubSets(const std::vector<FiniteSingleValue*> &singles):
+    singles(singles) {};
+    UnionSubSets(const std::vector<Interval*> &intervals):
+        intervals(intervals){};
+    UnionSubSets(const std::vector<FiniteSingleValue*> &singles, const std::vector<Interval*> &intervals):
+        singles(singles), intervals(intervals) {};
     
     bool operator==(const SubSetRealLine &other) const final {
-        const UnionSubsets *unionsubsets = dynamic_cast<const UnionSubsets*>(&other);
+        const UnionSubSets *unionsubsets = dynamic_cast<const UnionSubSets*>(&other);
         return unionsubsets && this->operator==(*unionsubsets);
     };
     bool operator!=(const SubSetRealLine &other) const final {
-        const UnionSubsets *unionsubsets = dynamic_cast<const UnionSubsets*>(&other);
+        const UnionSubSets *unionsubsets = dynamic_cast<const UnionSubSets*>(&other);
         return !unionsubsets || this->operator!=(*unionsubsets);
     };
-    virtual bool operator==(const UnionSubsets &other) const final {
+    virtual bool operator==(const UnionSubSets &other) const final {
         return false;
     };
-    virtual bool operator!=(const UnionSubsets &other) const final {
+    virtual bool operator!=(const UnionSubSets &other) const final {
         return false;
     };
-    bool contains(const SubSetRealLine &other) const final {
-        return false;
-    }
+    bool contains(const SubSetRealLine &other) const final;
+
+    friend std::ostream &operator<< (std::ostream &os, const UnionSubSets &value);
 };
 
 static const NegativeInfinity& BOTINF = NegativeInfinity::getInstance();
@@ -364,16 +327,118 @@ static const EmptyParam& EMPTY = EmptyParam::getInstance();
 static const WholeParam& WHOLE = WholeParam::getInstance();
 
 
-// SubSetRealLine &EmptyParam::operator~() const{
-//     return WHOLE;
-// }
-// SubSetRealLine &WholeParam::operator~() const{
-//     return EMPTY;
-// }
+std::ostream &operator<< (std::ostream &os, const EmptyParam &value){    
+    os << "{}";
+    return os;
+}
+
+std::ostream &operator<< (std::ostream &os, const WholeParam &value){    
+    os << "(-inf, +inf)";
+    return os;
+}
+
+std::ostream &operator<< (std::ostream &os, const SingleValue &value){    
+    const NegativeInfinity *neg = dynamic_cast<const NegativeInfinity*>(&value);
+    if(neg){
+        os << *neg;
+        return os;
+    }
+    const PositiveInfinity *pos = dynamic_cast<const PositiveInfinity*>(&value);
+    if(pos){
+        os << *pos;
+        return os;
+    }
+    const FiniteSingleValue *finite = dynamic_cast<const FiniteSingleValue*>(&value);
+    if(finite){
+        os << *finite;
+        return os;
+    }
+    throw std::runtime_error("Not expected to get here!");
+}
+
+std::ostream &operator<< (std::ostream &os, const NegativeInfinity &value){    
+    os << "-inf";
+    return os;
+}
+
+std::ostream &operator<< (std::ostream &os, const PositiveInfinity &value){    
+    os << "+inf";
+    return os;
+}
+
+std::ostream &operator<< (std::ostream &os, const FiniteSingleValue &value){    
+    os << *value.internal;
+    return os;
+}
+
+std::ostream &operator<< (std::ostream &os, const Interval &value){    
+    os << "[" << *value.start << ", " << *value.end << "]";
+    return os;
+}
 
 
 
-template class FiniteSingleValue<int>;
+Interval::Interval(const SingleValue *start, const SingleValue *end):
+    start(start), end(end) {
+        if(*end <= *start)
+            throw std::invalid_argument("In interval [start, end], must have 'start < end'");
+        if(*start == BOTINF && *end == TOPINF)
+            throw std::invalid_argument("Cannot make interval (-inf, +inf), use Whole instead");
+    };
+
+
+
+
+bool Interval::contains(const SubSetRealLine &other) const {
+    const SingleValue *single = dynamic_cast<const SingleValue*>(&other);
+    if (single)
+        return *start <= *single && *single <= *end;
+    const Interval *interval = dynamic_cast<const Interval*>(&other);
+    if (interval)
+        return *start <= *interval->start && *interval->end <= *end;
+    const UnionSubSets *subsets = dynamic_cast<const UnionSubSets*>(&other);
+    if (subsets){
+        for(uint1 i = 0; i < subsets->singles.size(); i++){
+            const SingleValue *single = subsets->singles[i];
+            if (*single < *this->start || *this->end < *single)
+                return false;
+        }
+        for(uint1 i = 0; i < subsets->intervals.size(); i++){
+            const Interval *interval = subsets->intervals[i];
+            if (*interval->start < *this->start || *this->end < *interval->end)
+                return false;
+        }
+        return true;
+    }
+    return dynamic_cast<const EmptyParam*>(&other);
+};
+
+
+bool UnionSubSets::contains(const SubSetRealLine &other) const {
+    const SingleValue *single = dynamic_cast<const SingleValue*>(&other);
+    if (single){
+        for(uint1 i = 0; i < this->singles.size(); i++)
+            if(*single == *this->singles[i])
+                return true;
+        for(uint1 i = 0; i < this->intervals.size(); i++){
+            const Interval *interv = this->intervals[i];
+            if((*(interv->start) <= *single) && (*single <= *(interv->end)))
+                return true;
+        }
+    }
+    const Interval *interval = dynamic_cast<const Interval*>(&other);
+    if (interval)
+        for(uint1 i = 0; i < this->intervals.size(); i++){
+            const Interval *interv = this->intervals[i];
+            if(*interv->start <= *interval->start && *interval->end <= *interv->end)
+                return true;
+        }
+    const UnionSubSets *subsets = dynamic_cast<const UnionSubSets*>(&other);
+    if (subsets){
+        return true;
+    }
+    return dynamic_cast<const EmptyParam*>(&other);
+};
 
 
 

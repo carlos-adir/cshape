@@ -93,7 +93,32 @@ TEST(ParameterTest, CompareSingleton)
 TEST(ParameterTest, BuildsSingleValue)
 {
     double value = 10;
-    FiniteSingleValue<double> param(&value);
+    FiniteSingleValue param(&value);
+}
+
+
+
+TEST(ParameterTest, BuildsInterval)
+{
+    const double da = -10, db = 10;
+    FiniteSingleValue fa(&da), fb(&db);
+
+    Interval interv1(&BOTINF, &fa);
+    Interval interv2(&BOTINF, &fb);
+    Interval interv3(&fa, &fb);
+    Interval interv4(&fa, &TOPINF);
+    Interval interv5(&fb, &TOPINF);
+
+    EXPECT_THROW(Interval(&fa, &BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(&fb, &BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(&fb, &fa), std::invalid_argument);
+    EXPECT_THROW(Interval(&TOPINF, &fa), std::invalid_argument);
+    EXPECT_THROW(Interval(&TOPINF, &fb), std::invalid_argument);
+    EXPECT_THROW(Interval(&BOTINF, &BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(&fa, &fa), std::invalid_argument);
+    EXPECT_THROW(Interval(&fb, &fb), std::invalid_argument);
+    EXPECT_THROW(Interval(&TOPINF, &TOPINF), std::invalid_argument);
+    EXPECT_THROW(Interval(&BOTINF, &TOPINF), std::invalid_argument);
 }
 
 
@@ -101,7 +126,7 @@ TEST(ParameterTest, BuildsSingleValue)
 TEST(ParameterTest, CompareFiniteInfinity)
 {
     double double_value = 10;
-    FiniteSingleValue<double> finite(&double_value);
+    FiniteSingleValue finite(&double_value);
 
     EXPECT_TRUE(BOTINF < finite);
     EXPECT_TRUE(BOTINF <= finite);
@@ -137,8 +162,8 @@ TEST(ParameterTest, CompareTwoFinites)
 {
     double douba = -10;
     double doubb = 10;
-    FiniteSingleValue<double> finia(&douba);
-    FiniteSingleValue<double> finib(&doubb);
+    FiniteSingleValue finia(&douba);
+    FiniteSingleValue finib(&doubb);
 
     EXPECT_TRUE(finia < finib);
     EXPECT_TRUE(finia <= finib);
@@ -153,13 +178,13 @@ TEST(ParameterTest, CompareTwoFinites)
     EXPECT_TRUE(finib > finia);
     EXPECT_FALSE(finib == finia);
     EXPECT_TRUE(finib != finia);
-}
+};
 
 
 TEST(ParameterTest, CompareFiniteEmptyWhole)
 {
     double double_value = 10;
-    FiniteSingleValue<double> finite(&double_value);
+    FiniteSingleValue finite(&double_value);
 
     EXPECT_FALSE(EMPTY == finite);
     EXPECT_TRUE(EMPTY != finite);
@@ -170,7 +195,7 @@ TEST(ParameterTest, CompareFiniteEmptyWhole)
     EXPECT_TRUE(WHOLE != finite);
     EXPECT_FALSE(finite == WHOLE);
     EXPECT_TRUE(finite != WHOLE);
-}
+};
 
 
 
@@ -195,13 +220,13 @@ TEST(ParameterTest, ContainsSingleton)
     EXPECT_TRUE(WHOLE.contains(BOTINF));
     EXPECT_TRUE(WHOLE.contains(TOPINF));
     EXPECT_TRUE(WHOLE.contains(WHOLE));
-}
+};
 
 
 TEST(ParameterTest, ContainsFinite)
 {
     double double_value = 10;
-    FiniteSingleValue<double> finite(&double_value);
+    FiniteSingleValue finite(&double_value);
 
     EXPECT_TRUE(finite.contains(finite));
 
@@ -214,13 +239,99 @@ TEST(ParameterTest, ContainsFinite)
     EXPECT_FALSE(BOTINF.contains(finite));
     EXPECT_FALSE(TOPINF.contains(finite));
     EXPECT_TRUE(WHOLE.contains(finite));
-}
+};
 
 
-TEST(ParameterTest, BooleanSingleton)
+
+
+TEST(ParameterTest, ContainsInterval)
 {
+    const double da = -10, db = 10;
+    FiniteSingleValue fa(&da), fb(&db);
+    Interval n2a(&BOTINF, &fa);
+    Interval n2b(&BOTINF, &fb);
+    Interval a2b(&fa, &fb);
+    Interval a2p(&fa, &TOPINF);
+    Interval b2p(&fb, &TOPINF);
 
-}
+    // Contains EMPTY
+    EXPECT_TRUE(n2a.contains(EMPTY));
+    EXPECT_TRUE(n2b.contains(EMPTY));
+    EXPECT_TRUE(a2b.contains(EMPTY));
+    EXPECT_TRUE(a2p.contains(EMPTY));
+    EXPECT_TRUE(b2p.contains(EMPTY));
+
+    // Contains WHOLE
+    EXPECT_FALSE(n2a.contains(WHOLE));
+    EXPECT_FALSE(n2b.contains(WHOLE));
+    EXPECT_FALSE(a2b.contains(WHOLE));
+    EXPECT_FALSE(a2p.contains(WHOLE));
+    EXPECT_FALSE(b2p.contains(WHOLE));
+
+    // Contains BOT INFINITY
+    EXPECT_TRUE(n2a.contains(BOTINF));
+    EXPECT_TRUE(n2b.contains(BOTINF));
+    EXPECT_FALSE(a2b.contains(BOTINF));
+    EXPECT_FALSE(a2p.contains(BOTINF));
+    EXPECT_FALSE(b2p.contains(BOTINF));
+    
+    // Contains TOP INFINITY
+    EXPECT_FALSE(n2a.contains(TOPINF));
+    EXPECT_FALSE(n2b.contains(TOPINF));
+    EXPECT_FALSE(a2b.contains(TOPINF));
+    EXPECT_TRUE(a2p.contains(TOPINF));
+    EXPECT_TRUE(b2p.contains(TOPINF));
+
+    // Contains A value
+    EXPECT_TRUE(n2a.contains(fa));
+    EXPECT_TRUE(n2b.contains(fa));
+    EXPECT_TRUE(a2b.contains(fa));
+    EXPECT_TRUE(a2p.contains(fa));
+    EXPECT_FALSE(b2p.contains(fa));
+
+    // Contains B value
+    EXPECT_FALSE(n2a.contains(fb));
+    EXPECT_TRUE(n2b.contains(fb));
+    EXPECT_TRUE(a2b.contains(fb));
+    EXPECT_TRUE(a2p.contains(fb));
+    EXPECT_TRUE(b2p.contains(fb));
+
+    // Contains (-inf, A)
+    EXPECT_TRUE(n2a.contains(n2a));
+    EXPECT_TRUE(n2b.contains(n2a));
+    EXPECT_FALSE(a2b.contains(n2a));
+    EXPECT_FALSE(a2p.contains(n2a));
+    EXPECT_FALSE(b2p.contains(n2a));
+
+    // Contains (-inf, B)
+    EXPECT_FALSE(n2a.contains(n2b));
+    EXPECT_TRUE(n2b.contains(n2b));
+    EXPECT_FALSE(a2b.contains(n2b));
+    EXPECT_FALSE(a2p.contains(n2b));
+    EXPECT_FALSE(b2p.contains(n2b));
+
+    // Contains (A, B)
+    EXPECT_FALSE(n2a.contains(a2b));
+    EXPECT_TRUE(n2b.contains(a2b));
+    EXPECT_TRUE(a2b.contains(a2b));
+    EXPECT_TRUE(a2p.contains(a2b));
+    EXPECT_FALSE(b2p.contains(a2b));
+
+    // Contains (A, +inf)
+    EXPECT_FALSE(n2a.contains(a2p));
+    EXPECT_FALSE(n2b.contains(a2p));
+    EXPECT_FALSE(a2b.contains(a2p));
+    EXPECT_TRUE(a2p.contains(a2p));
+    EXPECT_FALSE(b2p.contains(a2p));
+
+    // Contains (B, +inf)
+    EXPECT_FALSE(n2a.contains(b2p));
+    EXPECT_FALSE(n2b.contains(b2p));
+    EXPECT_FALSE(a2b.contains(b2p));
+    EXPECT_TRUE(a2p.contains(b2p));
+    EXPECT_TRUE(b2p.contains(b2p));
+
+};
 
 
 
