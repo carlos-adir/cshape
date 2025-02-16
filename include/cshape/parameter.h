@@ -84,7 +84,6 @@ public:
     bool operator!=(const SubSetRealLine &other) const final {
         return !dynamic_cast<const WholeParam*>(&other);
     };
-
     bool contains(const SubSetRealLine &other) const final {
         return true;
     };
@@ -205,7 +204,8 @@ private:
     const double *internal;
 
 public:
-    FiniteSingleValue(const double *value) : internal(value) {};
+    FiniteSingleValue(const double *value);
+    FiniteSingleValue(const double &value);
     
     using SingleValue::operator==;
     using SingleValue::operator!=;
@@ -267,7 +267,9 @@ public:
 class Interval : public SubSetRealLine {
 public:
     const SingleValue *start, *end;
+
     Interval(const SingleValue *start, const SingleValue *end);
+    Interval(const SingleValue &start, const SingleValue &end);
 
     bool operator==(const SubSetRealLine &other) const final {
         const Interval *interval = dynamic_cast<const Interval*>(&other);
@@ -327,6 +329,44 @@ static const EmptyParam& EMPTY = EmptyParam::getInstance();
 static const WholeParam& WHOLE = WholeParam::getInstance();
 
 
+//
+//
+//
+//   CONSTRUCTOR IMPLEMENTATIONS
+//
+//
+//
+
+FiniteSingleValue::FiniteSingleValue(const double *value)
+    : internal(value) {};
+FiniteSingleValue::FiniteSingleValue(const double &value)
+    : FiniteSingleValue(&value) {};
+
+
+Interval::Interval(const SingleValue *start, const SingleValue *end):
+    start(start), end(end) {
+        if(*end <= *start)
+            throw std::invalid_argument("In interval [start, end], must have 'start < end'");
+        if(*start == BOTINF && *end == TOPINF)
+            throw std::invalid_argument("Cannot make interval (-inf, +inf), use Whole instead");
+    };
+
+Interval::Interval(const SingleValue &start, const SingleValue &end):
+Interval(&start, &end) {};
+
+
+
+
+
+// 
+//
+//
+//  Printing implementations
+// 
+//
+//
+
+
 std::ostream &operator<< (std::ostream &os, const EmptyParam &value){    
     os << "{}";
     return os;
@@ -378,14 +418,15 @@ std::ostream &operator<< (std::ostream &os, const Interval &value){
 
 
 
-Interval::Interval(const SingleValue *start, const SingleValue *end):
-    start(start), end(end) {
-        if(*end <= *start)
-            throw std::invalid_argument("In interval [start, end], must have 'start < end'");
-        if(*start == BOTINF && *end == TOPINF)
-            throw std::invalid_argument("Cannot make interval (-inf, +inf), use Whole instead");
-    };
 
+
+// 
+//
+//
+//  Contains implementations
+// 
+//
+//
 
 
 

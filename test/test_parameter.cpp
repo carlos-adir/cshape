@@ -93,7 +93,7 @@ TEST(ParameterTest, CompareSingleton)
 TEST(ParameterTest, BuildsSingleValue)
 {
     double value = 10;
-    FiniteSingleValue param(&value);
+    FiniteSingleValue param(value);
 }
 
 
@@ -101,24 +101,24 @@ TEST(ParameterTest, BuildsSingleValue)
 TEST(ParameterTest, BuildsInterval)
 {
     const double da = -10, db = 10;
-    FiniteSingleValue fa(&da), fb(&db);
+    FiniteSingleValue fa(da), fb(db);
 
-    Interval interv1(&BOTINF, &fa);
-    Interval interv2(&BOTINF, &fb);
-    Interval interv3(&fa, &fb);
-    Interval interv4(&fa, &TOPINF);
-    Interval interv5(&fb, &TOPINF);
+    Interval interv1(BOTINF, fa);
+    Interval interv2(BOTINF, fb);
+    Interval interv3(fa, fb);
+    Interval interv4(fa, TOPINF);
+    Interval interv5(fb, TOPINF);
 
-    EXPECT_THROW(Interval(&fa, &BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(&fb, &BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(&fb, &fa), std::invalid_argument);
-    EXPECT_THROW(Interval(&TOPINF, &fa), std::invalid_argument);
-    EXPECT_THROW(Interval(&TOPINF, &fb), std::invalid_argument);
-    EXPECT_THROW(Interval(&BOTINF, &BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(&fa, &fa), std::invalid_argument);
-    EXPECT_THROW(Interval(&fb, &fb), std::invalid_argument);
-    EXPECT_THROW(Interval(&TOPINF, &TOPINF), std::invalid_argument);
-    EXPECT_THROW(Interval(&BOTINF, &TOPINF), std::invalid_argument);
+    EXPECT_THROW(Interval(fa, BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(fb, BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(fb, fa), std::invalid_argument);
+    EXPECT_THROW(Interval(TOPINF, fa), std::invalid_argument);
+    EXPECT_THROW(Interval(TOPINF, fb), std::invalid_argument);
+    EXPECT_THROW(Interval(BOTINF, BOTINF), std::invalid_argument);
+    EXPECT_THROW(Interval(fa, fa), std::invalid_argument);
+    EXPECT_THROW(Interval(fb, fb), std::invalid_argument);
+    EXPECT_THROW(Interval(TOPINF, TOPINF), std::invalid_argument);
+    EXPECT_THROW(Interval(BOTINF, TOPINF), std::invalid_argument);
 }
 
 
@@ -126,7 +126,7 @@ TEST(ParameterTest, BuildsInterval)
 TEST(ParameterTest, CompareFiniteInfinity)
 {
     double double_value = 10;
-    FiniteSingleValue finite(&double_value);
+    FiniteSingleValue finite(double_value);
 
     EXPECT_TRUE(BOTINF < finite);
     EXPECT_TRUE(BOTINF <= finite);
@@ -162,8 +162,8 @@ TEST(ParameterTest, CompareTwoFinites)
 {
     double douba = -10;
     double doubb = 10;
-    FiniteSingleValue finia(&douba);
-    FiniteSingleValue finib(&doubb);
+    FiniteSingleValue finia(douba);
+    FiniteSingleValue finib(doubb);
 
     EXPECT_TRUE(finia < finib);
     EXPECT_TRUE(finia <= finib);
@@ -184,7 +184,7 @@ TEST(ParameterTest, CompareTwoFinites)
 TEST(ParameterTest, CompareFiniteEmptyWhole)
 {
     double double_value = 10;
-    FiniteSingleValue finite(&double_value);
+    FiniteSingleValue finite(double_value);
 
     EXPECT_FALSE(EMPTY == finite);
     EXPECT_TRUE(EMPTY != finite);
@@ -226,7 +226,7 @@ TEST(ParameterTest, ContainsSingleton)
 TEST(ParameterTest, ContainsFinite)
 {
     double double_value = 10;
-    FiniteSingleValue finite(&double_value);
+    FiniteSingleValue finite(double_value);
 
     EXPECT_TRUE(finite.contains(finite));
 
@@ -247,12 +247,12 @@ TEST(ParameterTest, ContainsFinite)
 TEST(ParameterTest, ContainsInterval)
 {
     const double da = -10, db = 10;
-    FiniteSingleValue fa(&da), fb(&db);
-    Interval n2a(&BOTINF, &fa);
-    Interval n2b(&BOTINF, &fb);
-    Interval a2b(&fa, &fb);
-    Interval a2p(&fa, &TOPINF);
-    Interval b2p(&fb, &TOPINF);
+    FiniteSingleValue fa(da), fb(db);
+    Interval n2a(BOTINF, fa);
+    Interval n2b(BOTINF, fb);
+    Interval a2b(fa, fb);
+    Interval a2p(fa, TOPINF);
+    Interval b2p(fb, TOPINF);
 
     // Contains EMPTY
     EXPECT_TRUE(n2a.contains(EMPTY));
@@ -330,7 +330,6 @@ TEST(ParameterTest, ContainsInterval)
     EXPECT_FALSE(a2b.contains(b2p));
     EXPECT_TRUE(a2p.contains(b2p));
     EXPECT_TRUE(b2p.contains(b2p));
-
 };
 
 
