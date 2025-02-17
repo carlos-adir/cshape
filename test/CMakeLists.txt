@@ -9,12 +9,21 @@ enable_testing()
 #   cshape
 #   GTest::gtest_main
 # )
+# add_executable(
+#   test_parameter
+#   test_parameter.cpp
+# )
+# target_link_libraries(
+#   test_parameter
+#   cshape
+#   GTest::gtest_main
+# )
 add_executable(
-  test_parameter
-  test_parameter.cpp
+  test_bool2d
+  test_bool2d.cpp
 )
 target_link_libraries(
-  test_parameter
+  test_bool2d
   cshape
   GTest::gtest_main
 )
@@ -22,5 +31,6 @@ target_link_libraries(
 
 include(GoogleTest)
 # gtest_discover_tests(test_polynomial)
-gtest_discover_tests(test_parameter)
+# gtest_discover_tests(test_parameter)
+gtest_discover_tests(test_bool2d)
 
