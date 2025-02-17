@@ -11,82 +11,82 @@ TEST(ParameterTest, ConstructorSingleton)
 {
     const NegativeInfinity& botinf = NegativeInfinity::getInstance();
     const PositiveInfinity& topinf = PositiveInfinity::getInstance();
-    const EmptyParam& empty = EmptyParam::getInstance();
-    const WholeParam& whole = WholeParam::getInstance();
+    const EmptyR1& empty = EmptyR1::getInstance();
+    const WholeR1& whole = WholeR1::getInstance();
     
-    EXPECT_TRUE(&topinf == &TOPINF);
-    EXPECT_TRUE(&botinf == &BOTINF);
-    EXPECT_TRUE(&empty == &EMPTY);
-    EXPECT_TRUE(&whole == &WHOLE);
+    EXPECT_TRUE(&topinf == &POSINF);
+    EXPECT_TRUE(&botinf == &NEGINF);
+    EXPECT_TRUE(&empty == &EMPTYR1);
+    EXPECT_TRUE(&whole == &WHOLER1);
 }
 
 
 TEST(ParameterTest, CompareSingleton)
 {
-    // EMPTY and WHOLE
-    EXPECT_TRUE(EMPTY == EMPTY);
-    EXPECT_FALSE(EMPTY == WHOLE);
-    EXPECT_FALSE(WHOLE == EMPTY);
-    EXPECT_TRUE(WHOLE == WHOLE);
+    // EMPTYR1 and WHOLER1
+    EXPECT_TRUE(EMPTYR1 == EMPTYR1);
+    EXPECT_FALSE(EMPTYR1 == WHOLER1);
+    EXPECT_FALSE(WHOLER1 == EMPTYR1);
+    EXPECT_TRUE(WHOLER1 == WHOLER1);
 
-    EXPECT_FALSE(EMPTY != EMPTY);
-    EXPECT_TRUE(EMPTY != WHOLE);
-    EXPECT_TRUE(WHOLE != EMPTY);
-    EXPECT_FALSE(WHOLE != WHOLE);
+    EXPECT_FALSE(EMPTYR1 != EMPTYR1);
+    EXPECT_TRUE(EMPTYR1 != WHOLER1);
+    EXPECT_TRUE(WHOLER1 != EMPTYR1);
+    EXPECT_FALSE(WHOLER1 != WHOLER1);
     
-    // EMPTY and INF
-    EXPECT_FALSE(EMPTY == BOTINF);
-    EXPECT_FALSE(EMPTY == TOPINF);
-    EXPECT_TRUE(EMPTY != BOTINF);
-    EXPECT_TRUE(EMPTY != TOPINF);
+    // EMPTYR1 and INF
+    EXPECT_FALSE(EMPTYR1 == NEGINF);
+    EXPECT_FALSE(EMPTYR1 == POSINF);
+    EXPECT_TRUE(EMPTYR1 != NEGINF);
+    EXPECT_TRUE(EMPTYR1 != POSINF);
 
-    EXPECT_FALSE(BOTINF == EMPTY);
-    EXPECT_FALSE(TOPINF == EMPTY);
-    EXPECT_TRUE(BOTINF != EMPTY);
-    EXPECT_TRUE(TOPINF != EMPTY);
+    EXPECT_FALSE(NEGINF == EMPTYR1);
+    EXPECT_FALSE(POSINF == EMPTYR1);
+    EXPECT_TRUE(NEGINF != EMPTYR1);
+    EXPECT_TRUE(POSINF != EMPTYR1);
 
-    // WHOLE and INF
-    EXPECT_FALSE(WHOLE == BOTINF);
-    EXPECT_FALSE(WHOLE == TOPINF);
-    EXPECT_TRUE(WHOLE != BOTINF);
-    EXPECT_TRUE(WHOLE != TOPINF);  
+    // WHOLER1 and INF
+    EXPECT_FALSE(WHOLER1 == NEGINF);
+    EXPECT_FALSE(WHOLER1 == POSINF);
+    EXPECT_TRUE(WHOLER1 != NEGINF);
+    EXPECT_TRUE(WHOLER1 != POSINF);  
 
-    EXPECT_FALSE(BOTINF == WHOLE);
-    EXPECT_FALSE(TOPINF == WHOLE);
-    EXPECT_TRUE(BOTINF != WHOLE);
-    EXPECT_TRUE(TOPINF != WHOLE);
+    EXPECT_FALSE(NEGINF == WHOLER1);
+    EXPECT_FALSE(POSINF == WHOLER1);
+    EXPECT_TRUE(NEGINF != WHOLER1);
+    EXPECT_TRUE(POSINF != WHOLER1);
 
     // BOT with BOT
-    EXPECT_TRUE(BOTINF == BOTINF);
-    EXPECT_FALSE(BOTINF != BOTINF);
-    EXPECT_FALSE(BOTINF < BOTINF);
-    EXPECT_TRUE(BOTINF <= BOTINF);
-    EXPECT_TRUE(BOTINF >= BOTINF);
-    EXPECT_FALSE(BOTINF > BOTINF);
+    EXPECT_TRUE(NEGINF == NEGINF);
+    EXPECT_FALSE(NEGINF != NEGINF);
+    EXPECT_FALSE(NEGINF < NEGINF);
+    EXPECT_TRUE(NEGINF <= NEGINF);
+    EXPECT_TRUE(NEGINF >= NEGINF);
+    EXPECT_FALSE(NEGINF > NEGINF);
 
     // TOP with TOP
-    EXPECT_TRUE(TOPINF == TOPINF);
-    EXPECT_FALSE(TOPINF != TOPINF);
-    EXPECT_FALSE(TOPINF < TOPINF);
-    EXPECT_TRUE(TOPINF <= TOPINF);
-    EXPECT_TRUE(TOPINF >= TOPINF);
-    EXPECT_FALSE(TOPINF > TOPINF);
+    EXPECT_TRUE(POSINF == POSINF);
+    EXPECT_FALSE(POSINF != POSINF);
+    EXPECT_FALSE(POSINF < POSINF);
+    EXPECT_TRUE(POSINF <= POSINF);
+    EXPECT_TRUE(POSINF >= POSINF);
+    EXPECT_FALSE(POSINF > POSINF);
 
     // BOT with TOP
-    EXPECT_FALSE(BOTINF == TOPINF);
-    EXPECT_TRUE(BOTINF != TOPINF);
-    EXPECT_TRUE(BOTINF < TOPINF);
-    EXPECT_TRUE(BOTINF <= TOPINF);
-    EXPECT_FALSE(BOTINF >= TOPINF);
-    EXPECT_FALSE(BOTINF > TOPINF);
+    EXPECT_FALSE(NEGINF == POSINF);
+    EXPECT_TRUE(NEGINF != POSINF);
+    EXPECT_TRUE(NEGINF < POSINF);
+    EXPECT_TRUE(NEGINF <= POSINF);
+    EXPECT_FALSE(NEGINF >= POSINF);
+    EXPECT_FALSE(NEGINF > POSINF);
     
     // TOP with BOT
-    EXPECT_FALSE(TOPINF == BOTINF);
-    EXPECT_TRUE(TOPINF != BOTINF);
-    EXPECT_FALSE(TOPINF < BOTINF);
-    EXPECT_FALSE(TOPINF <= BOTINF);
-    EXPECT_TRUE(TOPINF >= BOTINF);
-    EXPECT_TRUE(TOPINF > BOTINF);
+    EXPECT_FALSE(POSINF == NEGINF);
+    EXPECT_TRUE(POSINF != NEGINF);
+    EXPECT_FALSE(POSINF < NEGINF);
+    EXPECT_FALSE(POSINF <= NEGINF);
+    EXPECT_TRUE(POSINF >= NEGINF);
+    EXPECT_TRUE(POSINF > NEGINF);
 }
 
 
@@ -103,22 +103,15 @@ TEST(ParameterTest, BuildsInterval)
     const double da = -10, db = 10;
     FiniteSingleValue fa(da), fb(db);
 
-    Interval interv1(BOTINF, fa);
-    Interval interv2(BOTINF, fb);
-    Interval interv3(fa, fb);
-    Interval interv4(fa, TOPINF);
-    Interval interv5(fb, TOPINF);
+    IntervalR1 interv1(NEGINF, fa);
+    IntervalR1 interv2(NEGINF, fb);
+    IntervalR1 interv3(fa, fb);
+    IntervalR1 interv4(fa, POSINF);
+    IntervalR1 interv5(fb, POSINF);
 
-    EXPECT_THROW(Interval(fa, BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(fb, BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(fb, fa), std::invalid_argument);
-    EXPECT_THROW(Interval(TOPINF, fa), std::invalid_argument);
-    EXPECT_THROW(Interval(TOPINF, fb), std::invalid_argument);
-    EXPECT_THROW(Interval(BOTINF, BOTINF), std::invalid_argument);
-    EXPECT_THROW(Interval(fa, fa), std::invalid_argument);
-    EXPECT_THROW(Interval(fb, fb), std::invalid_argument);
-    EXPECT_THROW(Interval(TOPINF, TOPINF), std::invalid_argument);
-    EXPECT_THROW(Interval(BOTINF, TOPINF), std::invalid_argument);
+    EXPECT_THROW(IntervalR1(fa, fa), std::invalid_argument);
+    EXPECT_THROW(IntervalR1(fb, fa), std::invalid_argument);
+    EXPECT_THROW(IntervalR1(fb, fb), std::invalid_argument);
 }
 
 
@@ -128,33 +121,33 @@ TEST(ParameterTest, CompareFiniteInfinity)
     double double_value = 10;
     FiniteSingleValue finite(double_value);
 
-    EXPECT_TRUE(BOTINF < finite);
-    EXPECT_TRUE(BOTINF <= finite);
-    EXPECT_FALSE(BOTINF >= finite);
-    EXPECT_FALSE(BOTINF > finite);
-    EXPECT_FALSE(BOTINF == finite);
-    EXPECT_TRUE(BOTINF != finite);
+    EXPECT_TRUE(NEGINF < finite);
+    EXPECT_TRUE(NEGINF <= finite);
+    EXPECT_FALSE(NEGINF >= finite);
+    EXPECT_FALSE(NEGINF > finite);
+    EXPECT_FALSE(NEGINF == finite);
+    EXPECT_TRUE(NEGINF != finite);
     
-    EXPECT_FALSE(finite < BOTINF);
-    EXPECT_FALSE(finite <= BOTINF);
-    EXPECT_TRUE(finite >= BOTINF);
-    EXPECT_TRUE(finite > BOTINF);
-    EXPECT_FALSE(finite == BOTINF);
-    EXPECT_TRUE(finite != BOTINF);
+    EXPECT_FALSE(finite < NEGINF);
+    EXPECT_FALSE(finite <= NEGINF);
+    EXPECT_TRUE(finite >= NEGINF);
+    EXPECT_TRUE(finite > NEGINF);
+    EXPECT_FALSE(finite == NEGINF);
+    EXPECT_TRUE(finite != NEGINF);
 
-    EXPECT_FALSE(TOPINF < finite);
-    EXPECT_FALSE(TOPINF <= finite);
-    EXPECT_TRUE(TOPINF >= finite);
-    EXPECT_TRUE(TOPINF > finite);
-    EXPECT_FALSE(TOPINF == finite);
-    EXPECT_TRUE(TOPINF != finite);
+    EXPECT_FALSE(POSINF < finite);
+    EXPECT_FALSE(POSINF <= finite);
+    EXPECT_TRUE(POSINF >= finite);
+    EXPECT_TRUE(POSINF > finite);
+    EXPECT_FALSE(POSINF == finite);
+    EXPECT_TRUE(POSINF != finite);
     
-    EXPECT_TRUE(finite < TOPINF);
-    EXPECT_TRUE(finite <= TOPINF);
-    EXPECT_FALSE(finite >= TOPINF);
-    EXPECT_FALSE(finite > TOPINF);
-    EXPECT_FALSE(finite == TOPINF);
-    EXPECT_TRUE(finite != TOPINF);
+    EXPECT_TRUE(finite < POSINF);
+    EXPECT_TRUE(finite <= POSINF);
+    EXPECT_FALSE(finite >= POSINF);
+    EXPECT_FALSE(finite > POSINF);
+    EXPECT_FALSE(finite == POSINF);
+    EXPECT_TRUE(finite != POSINF);
 }
 
 
@@ -186,40 +179,40 @@ TEST(ParameterTest, CompareFiniteEmptyWhole)
     double double_value = 10;
     FiniteSingleValue finite(double_value);
 
-    EXPECT_FALSE(EMPTY == finite);
-    EXPECT_TRUE(EMPTY != finite);
-    EXPECT_FALSE(finite == EMPTY);
-    EXPECT_TRUE(finite != EMPTY);
+    EXPECT_FALSE(EMPTYR1 == finite);
+    EXPECT_TRUE(EMPTYR1 != finite);
+    EXPECT_FALSE(finite == EMPTYR1);
+    EXPECT_TRUE(finite != EMPTYR1);
 
-    EXPECT_FALSE(WHOLE == finite);
-    EXPECT_TRUE(WHOLE != finite);
-    EXPECT_FALSE(finite == WHOLE);
-    EXPECT_TRUE(finite != WHOLE);
+    EXPECT_FALSE(WHOLER1 == finite);
+    EXPECT_TRUE(WHOLER1 != finite);
+    EXPECT_FALSE(finite == WHOLER1);
+    EXPECT_TRUE(finite != WHOLER1);
 };
 
 
 
 TEST(ParameterTest, ContainsSingleton)
 {
-    EXPECT_TRUE(EMPTY.contains(EMPTY));
-    EXPECT_FALSE(EMPTY.contains(BOTINF));
-    EXPECT_FALSE(EMPTY.contains(TOPINF));
-    EXPECT_FALSE(EMPTY.contains(WHOLE));
+    EXPECT_TRUE(EMPTYR1.contains(EMPTYR1));
+    EXPECT_FALSE(EMPTYR1.contains(NEGINF));
+    EXPECT_FALSE(EMPTYR1.contains(POSINF));
+    EXPECT_FALSE(EMPTYR1.contains(WHOLER1));
 
-    EXPECT_TRUE(BOTINF.contains(EMPTY));
-    EXPECT_TRUE(BOTINF.contains(BOTINF));
-    EXPECT_FALSE(BOTINF.contains(TOPINF));
-    EXPECT_FALSE(BOTINF.contains(WHOLE));
+    EXPECT_TRUE(NEGINF.contains(EMPTYR1));
+    EXPECT_TRUE(NEGINF.contains(NEGINF));
+    EXPECT_FALSE(NEGINF.contains(POSINF));
+    EXPECT_FALSE(NEGINF.contains(WHOLER1));
 
-    EXPECT_TRUE(TOPINF.contains(EMPTY));
-    EXPECT_FALSE(TOPINF.contains(BOTINF));
-    EXPECT_TRUE(TOPINF.contains(TOPINF));
-    EXPECT_FALSE(TOPINF.contains(WHOLE));
+    EXPECT_TRUE(POSINF.contains(EMPTYR1));
+    EXPECT_FALSE(POSINF.contains(NEGINF));
+    EXPECT_TRUE(POSINF.contains(POSINF));
+    EXPECT_FALSE(POSINF.contains(WHOLER1));
     
-    EXPECT_TRUE(WHOLE.contains(EMPTY));
-    EXPECT_TRUE(WHOLE.contains(BOTINF));
-    EXPECT_TRUE(WHOLE.contains(TOPINF));
-    EXPECT_TRUE(WHOLE.contains(WHOLE));
+    EXPECT_TRUE(WHOLER1.contains(EMPTYR1));
+    EXPECT_TRUE(WHOLER1.contains(NEGINF));
+    EXPECT_TRUE(WHOLER1.contains(POSINF));
+    EXPECT_TRUE(WHOLER1.contains(WHOLER1));
 };
 
 
@@ -230,15 +223,15 @@ TEST(ParameterTest, ContainsFinite)
 
     EXPECT_TRUE(finite.contains(finite));
 
-    EXPECT_TRUE(finite.contains(EMPTY));
-    EXPECT_FALSE(finite.contains(BOTINF));
-    EXPECT_FALSE(finite.contains(TOPINF));
-    EXPECT_FALSE(finite.contains(WHOLE));
+    EXPECT_TRUE(finite.contains(EMPTYR1));
+    EXPECT_FALSE(finite.contains(NEGINF));
+    EXPECT_FALSE(finite.contains(POSINF));
+    EXPECT_FALSE(finite.contains(WHOLER1));
 
-    EXPECT_FALSE(EMPTY.contains(finite));
-    EXPECT_FALSE(BOTINF.contains(finite));
-    EXPECT_FALSE(TOPINF.contains(finite));
-    EXPECT_TRUE(WHOLE.contains(finite));
+    EXPECT_FALSE(EMPTYR1.contains(finite));
+    EXPECT_FALSE(NEGINF.contains(finite));
+    EXPECT_FALSE(POSINF.contains(finite));
+    EXPECT_TRUE(WHOLER1.contains(finite));
 };
 
 
@@ -246,41 +239,40 @@ TEST(ParameterTest, ContainsFinite)
 
 TEST(ParameterTest, ContainsInterval)
 {
-    const double da = -10, db = 10;
-    FiniteSingleValue fa(da), fb(db);
-    Interval n2a(BOTINF, fa);
-    Interval n2b(BOTINF, fb);
-    Interval a2b(fa, fb);
-    Interval a2p(fa, TOPINF);
-    Interval b2p(fb, TOPINF);
+    FiniteSingleValue fa(-10), fb(10);
+    IntervalR1 n2a(NEGINF, fa);
+    IntervalR1 n2b(NEGINF, fb);
+    IntervalR1 a2b(fa, fb);
+    IntervalR1 a2p(fa, POSINF);
+    IntervalR1 b2p(fb, POSINF);
 
-    // Contains EMPTY
-    EXPECT_TRUE(n2a.contains(EMPTY));
-    EXPECT_TRUE(n2b.contains(EMPTY));
-    EXPECT_TRUE(a2b.contains(EMPTY));
-    EXPECT_TRUE(a2p.contains(EMPTY));
-    EXPECT_TRUE(b2p.contains(EMPTY));
+    // Contains EMPTYR1
+    EXPECT_TRUE(n2a.contains(EMPTYR1));
+    EXPECT_TRUE(n2b.contains(EMPTYR1));
+    EXPECT_TRUE(a2b.contains(EMPTYR1));
+    EXPECT_TRUE(a2p.contains(EMPTYR1));
+    EXPECT_TRUE(b2p.contains(EMPTYR1));
 
-    // Contains WHOLE
-    EXPECT_FALSE(n2a.contains(WHOLE));
-    EXPECT_FALSE(n2b.contains(WHOLE));
-    EXPECT_FALSE(a2b.contains(WHOLE));
-    EXPECT_FALSE(a2p.contains(WHOLE));
-    EXPECT_FALSE(b2p.contains(WHOLE));
+    // Contains WHOLER1
+    EXPECT_FALSE(n2a.contains(WHOLER1));
+    EXPECT_FALSE(n2b.contains(WHOLER1));
+    EXPECT_FALSE(a2b.contains(WHOLER1));
+    EXPECT_FALSE(a2p.contains(WHOLER1));
+    EXPECT_FALSE(b2p.contains(WHOLER1));
 
     // Contains BOT INFINITY
-    EXPECT_TRUE(n2a.contains(BOTINF));
-    EXPECT_TRUE(n2b.contains(BOTINF));
-    EXPECT_FALSE(a2b.contains(BOTINF));
-    EXPECT_FALSE(a2p.contains(BOTINF));
-    EXPECT_FALSE(b2p.contains(BOTINF));
+    EXPECT_TRUE(n2a.contains(NEGINF));
+    EXPECT_TRUE(n2b.contains(NEGINF));
+    EXPECT_FALSE(a2b.contains(NEGINF));
+    EXPECT_FALSE(a2p.contains(NEGINF));
+    EXPECT_FALSE(b2p.contains(NEGINF));
     
     // Contains TOP INFINITY
-    EXPECT_FALSE(n2a.contains(TOPINF));
-    EXPECT_FALSE(n2b.contains(TOPINF));
-    EXPECT_FALSE(a2b.contains(TOPINF));
-    EXPECT_TRUE(a2p.contains(TOPINF));
-    EXPECT_TRUE(b2p.contains(TOPINF));
+    EXPECT_FALSE(n2a.contains(POSINF));
+    EXPECT_FALSE(n2b.contains(POSINF));
+    EXPECT_FALSE(a2b.contains(POSINF));
+    EXPECT_TRUE(a2p.contains(POSINF));
+    EXPECT_TRUE(b2p.contains(POSINF));
 
     // Contains A value
     EXPECT_TRUE(n2a.contains(fa));
