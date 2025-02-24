@@ -39,6 +39,12 @@ public:
 
     IntervalR1 &operator=(const std::string &str);
 
+    bool contains(const basetype &other) const;
+    bool contains(const IntervalR1 &other) const;
+
+    bool operator==(const IntervalR1 &other) const;
+    bool operator!=(const IntervalR1 &other) const;
+
     friend class SubSetR1;
 };
     
@@ -61,8 +67,8 @@ public:
     // virtual bool operator==(const SubSetR1 &other) const;
     // virtual bool operator!=(const SubSetR1 &other) const;
 
-    // virtual bool contains(const SubSetR1 &other) const;
-    // virtual bool contains(const basetype &other) const;
+    virtual bool contains(const SubSetR1 &other) const;
+    virtual bool contains(const basetype &other) const;
 
     // virtual SubSetR1 operator~() const;
     // virtual SubSetR1 operator|(const SubSetR1 &other) const;
@@ -88,6 +94,9 @@ public:
 
     SubSetR1 &operator=(const SubSetR1 &other);
     SubSetR1 &operator=(const std::string &other);
+
+    bool operator==(const SubSetR1 &other) const;
+    bool operator!=(const SubSetR1 &other) const;
 
     operator std::string() const;
     friend std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj);
@@ -217,7 +226,47 @@ SubSetR1 SubSetR1::interval(const basetype &sta,
 
 
 
+//
+//
+//
+// Comparate
+//
+//
+//
 
+bool IntervalR1::operator==(const IntervalR1 &other) const{
+    if ((this->sta == nullptr) ^ (other.sta == nullptr))
+        return false;
+    if ((this->sta == nullptr) ^ (other.sta == nullptr))
+        return false;
+    if (this->sta != nullptr && (this->left ^ other.left || *this->sta != *other.sta))
+        return false;
+    if (this->sta != nullptr && (this->left ^ other.left || *this->sta != *other.sta))
+        return false;
+    return true;
+}
+
+bool IntervalR1::operator!=(const IntervalR1 &other) const{
+    return !(this->operator==(other));
+}
+
+bool SubSetR1::operator==(const SubSetR1 &other) const{
+    if (this->finites.size() != other.finites.size())
+        return false;
+    if (this->intervals.size() != other.intervals.size())
+        return false;
+    for (size_t i = 0; i < this->intervals.size(); ++i)
+        if (this->intervals[i] != other.intervals[i])
+            return false;
+    for (size_t i = 0; i < this->finites.size(); ++i)
+        if (this->finites[i] != other.finites[i])
+            return false;
+    return true;
+}
+
+bool SubSetR1::operator!=(const SubSetR1 &other) const{
+    return !(this->operator==(other));
+}
 
 
 
@@ -412,6 +461,78 @@ std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj){
     return os;
 }
 
+
+
+bool IntervalR1::contains(const basetype &other) const{
+    if (this->sta != nullptr)
+        if (other < *this->sta || (!this->left && other == *this->sta))
+            return false;
+    if (this->end != nullptr)
+        if (*this->end < other || (!this->right && other == *this->end))
+            return false;
+    return true;
+}
+
+bool IntervalR1::contains(const IntervalR1 &other) const{
+    if ((other.sta == nullptr && this->sta != nullptr) || (other.end == nullptr && this->end != nullptr))
+        return false;
+    if (this->sta){
+        if (*other.sta < *this->sta)
+            return false;
+        if (other.left && !this->left && *other.sta == *this->sta)
+            return false;
+    }
+    if (this->end){
+        if (*this->end < *other.end)
+            return false;
+        if (other.right && !this->right && *other.end == *this->end)
+            return false;
+    }
+    return true;
+}
+
+
+bool SubSetR1::contains(const basetype &other) const{
+    for(size_t j = 0; j < this->intervals.size(); ++j)
+        if(this->intervals[j].contains(other))
+            return true;
+    for(size_t j = 0; j < this->finites.size(); ++j)
+        if(this->finites[j] == other)
+            return true;
+    return false;
+}
+
+
+
+bool SubSetR1::contains(const SubSetR1 &other) const{
+    bool exit;
+    for (size_t i = 0; i < other.intervals.size(); ++i){
+        exit = true;
+        for(size_t j = 0; j < this->intervals.size(); ++j)
+            if(this->intervals[j].contains(other.intervals[i])){
+                exit = false;
+                break;
+            }
+        if (exit) return false;
+    }
+    for (size_t i = 0; i < other.finites.size(); ++i){
+        const basetype finite = other.finites[i];
+        exit = true;
+        for(size_t j = 0; j < this->intervals.size(); ++j)
+            if(this->intervals[j].contains(finite)){
+                exit = false;
+                break;
+            }
+        if (!exit) continue;
+        for(size_t j = 0; j < this->finites.size(); ++j)
+            if(this->finites[j] == finite){
+                exit = false;
+                break;
+            }
+        if (exit) return false;
+    }
+    return true;
+}
 
 
 

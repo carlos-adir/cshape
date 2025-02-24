@@ -64,137 +64,147 @@ TEST(Bool1DTest, BuildsFromString)
 }
 
 
-// TEST(Bool1DTest, CompareSingleton)
-// {
-//     // EMPTYR1 and WHOLER1
-//     EXPECT_TRUE(EMPTYR1 == EMPTYR1);
-//     EXPECT_FALSE(EMPTYR1 == WHOLER1);
-//     EXPECT_FALSE(WHOLER1 == EMPTYR1);
-//     EXPECT_TRUE(WHOLER1 == WHOLER1);
+TEST(Bool1DTest, CompareSingleton)
+{
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    // empty and whole
+    EXPECT_TRUE(empty == empty);
+    EXPECT_FALSE(empty == whole);
+    EXPECT_FALSE(whole == empty);
+    EXPECT_TRUE(whole == whole);
 
-//     EXPECT_FALSE(EMPTYR1 != EMPTYR1);
-//     EXPECT_TRUE(EMPTYR1 != WHOLER1);
-//     EXPECT_TRUE(WHOLER1 != EMPTYR1);
-//     EXPECT_FALSE(WHOLER1 != WHOLER1);
-// }
-
-
-
-
-// TEST(Bool1DTest, CompareSingleEmptyWhole)
-// {
-//     SingleValue finite(10);
-
-//     EXPECT_FALSE(EMPTYR1 == finite);
-//     EXPECT_TRUE(EMPTYR1 != finite);
-//     EXPECT_FALSE(finite == EMPTYR1);
-//     EXPECT_TRUE(finite != EMPTYR1);
-
-//     EXPECT_FALSE(WHOLER1 == finite);
-//     EXPECT_TRUE(WHOLER1 != finite);
-//     EXPECT_FALSE(finite == WHOLER1);
-//     EXPECT_TRUE(finite != WHOLER1);
-// };
-
-
-
-// TEST(Bool1DTest, ContainsSingleton)
-// {
-//     EXPECT_TRUE(EMPTYR1.contains(EMPTYR1));
-//     EXPECT_FALSE(EMPTYR1.contains(WHOLER1));
-//     EXPECT_TRUE(WHOLER1.contains(EMPTYR1));
-//     EXPECT_TRUE(WHOLER1.contains(WHOLER1));
-// };
-
-
-// TEST(Bool1DTest, ContainsFinite)
-// {
-//     SingleValue finite(10);
-
-//     EXPECT_TRUE(finite.contains(finite));
-
-//     EXPECT_TRUE(finite.contains(EMPTYR1));
-//     EXPECT_FALSE(finite.contains(WHOLER1));
-
-//     EXPECT_FALSE(EMPTYR1.contains(finite));
-//     EXPECT_TRUE(WHOLER1.contains(finite));
-// };
+    EXPECT_FALSE(empty != empty);
+    EXPECT_TRUE(empty != whole);
+    EXPECT_TRUE(whole != empty);
+    EXPECT_FALSE(whole != whole);
+}
 
 
 
 
-// TEST(Bool1DTest, ContainsInterval)
-// {
-//     double fa(-10), fb(10);
-//     SubSetR1 n2a(NEGINF, fa);
-//     SubSetR1 n2b(NEGINF, fb);
-//     SubSetR1 a2b(fa, fb);
-//     SubSetR1 a2p(fa, POSINF);
-//     SubSetR1 b2p(fb, POSINF);
+TEST(Bool1DTest, CompareSingleEmptyWhole)
+{
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 finite = SubSetR1::single(0);
 
-//     // Contains EMPTYR1
-//     EXPECT_TRUE(n2a.contains(EMPTYR1));
-//     EXPECT_TRUE(n2b.contains(EMPTYR1));
-//     EXPECT_TRUE(a2b.contains(EMPTYR1));
-//     EXPECT_TRUE(a2p.contains(EMPTYR1));
-//     EXPECT_TRUE(b2p.contains(EMPTYR1));
+    EXPECT_FALSE(empty == finite);
+    EXPECT_TRUE(empty != finite);
+    EXPECT_FALSE(finite == empty);
+    EXPECT_TRUE(finite != empty);
 
-//     // Contains WHOLER1
-//     EXPECT_FALSE(n2a.contains(WHOLER1));
-//     EXPECT_FALSE(n2b.contains(WHOLER1));
-//     EXPECT_FALSE(a2b.contains(WHOLER1));
-//     EXPECT_FALSE(a2p.contains(WHOLER1));
-//     EXPECT_FALSE(b2p.contains(WHOLER1));
+    EXPECT_FALSE(whole == finite);
+    EXPECT_TRUE(whole != finite);
+    EXPECT_FALSE(finite == whole);
+    EXPECT_TRUE(finite != whole);
+};
 
-//     // Contains A value
-//     EXPECT_TRUE(n2a.contains(fa));
-//     EXPECT_TRUE(n2b.contains(fa));
-//     EXPECT_TRUE(a2b.contains(fa));
-//     EXPECT_TRUE(a2p.contains(fa));
-//     EXPECT_FALSE(b2p.contains(fa));
 
-//     // Contains B value
-//     EXPECT_FALSE(n2a.contains(fb));
-//     EXPECT_TRUE(n2b.contains(fb));
-//     EXPECT_TRUE(a2b.contains(fb));
-//     EXPECT_TRUE(a2p.contains(fb));
-//     EXPECT_TRUE(b2p.contains(fb));
 
-//     // Contains (-inf, A)
-//     EXPECT_TRUE(n2a.contains(n2a));
-//     EXPECT_TRUE(n2b.contains(n2a));
-//     EXPECT_FALSE(a2b.contains(n2a));
-//     EXPECT_FALSE(a2p.contains(n2a));
-//     EXPECT_FALSE(b2p.contains(n2a));
+TEST(Bool1DTest, ContainsSingleton)
+{
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    EXPECT_TRUE(empty.contains(empty));
+    EXPECT_FALSE(empty.contains(whole));
+    EXPECT_TRUE(whole.contains(empty));
+    EXPECT_TRUE(whole.contains(whole));
+};
 
-//     // Contains (-inf, B)
-//     EXPECT_FALSE(n2a.contains(n2b));
-//     EXPECT_TRUE(n2b.contains(n2b));
-//     EXPECT_FALSE(a2b.contains(n2b));
-//     EXPECT_FALSE(a2p.contains(n2b));
-//     EXPECT_FALSE(b2p.contains(n2b));
 
-//     // Contains (A, B)
-//     EXPECT_FALSE(n2a.contains(a2b));
-//     EXPECT_TRUE(n2b.contains(a2b));
-//     EXPECT_TRUE(a2b.contains(a2b));
-//     EXPECT_TRUE(a2p.contains(a2b));
-//     EXPECT_FALSE(b2p.contains(a2b));
+TEST(Bool1DTest, ContainsFinite)
+{
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 finite = SubSetR1::single(10);
 
-//     // Contains (A, +inf)
-//     EXPECT_FALSE(n2a.contains(a2p));
-//     EXPECT_FALSE(n2b.contains(a2p));
-//     EXPECT_FALSE(a2b.contains(a2p));
-//     EXPECT_TRUE(a2p.contains(a2p));
-//     EXPECT_FALSE(b2p.contains(a2p));
+    EXPECT_TRUE(finite.contains(finite));
 
-//     // Contains (B, +inf)
-//     EXPECT_FALSE(n2a.contains(b2p));
-//     EXPECT_FALSE(n2b.contains(b2p));
-//     EXPECT_FALSE(a2b.contains(b2p));
-//     EXPECT_TRUE(a2p.contains(b2p));
-//     EXPECT_TRUE(b2p.contains(b2p));
-// };
+    EXPECT_TRUE(finite.contains(empty));
+    EXPECT_FALSE(finite.contains(whole));
+
+    EXPECT_FALSE(empty.contains(finite));
+    EXPECT_TRUE(whole.contains(finite));
+};
+
+
+
+
+TEST(Bool1DTest, ContainsInterval)
+{
+    double fa(-10), fb(10);
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 n2a = SubSetR1::interval(NEGINF, fa);
+    SubSetR1 n2b = SubSetR1::interval(NEGINF, fb);
+    SubSetR1 a2b = SubSetR1::interval(fa, fb);
+    SubSetR1 a2p = SubSetR1::interval(fa, POSINF);
+    SubSetR1 b2p = SubSetR1::interval(fb, POSINF);
+
+    // Contains empty
+    EXPECT_TRUE(n2a.contains(empty));
+    EXPECT_TRUE(n2b.contains(empty));
+    EXPECT_TRUE(a2b.contains(empty));
+    EXPECT_TRUE(a2p.contains(empty));
+    EXPECT_TRUE(b2p.contains(empty));
+
+    // Contains whole
+    EXPECT_FALSE(n2a.contains(whole));
+    EXPECT_FALSE(n2b.contains(whole));
+    EXPECT_FALSE(a2b.contains(whole));
+    EXPECT_FALSE(a2p.contains(whole));
+    EXPECT_FALSE(b2p.contains(whole));
+
+    // Contains A value
+    EXPECT_TRUE(n2a.contains(fa));
+    EXPECT_TRUE(n2b.contains(fa));
+    EXPECT_TRUE(a2b.contains(fa));
+    EXPECT_TRUE(a2p.contains(fa));
+    EXPECT_FALSE(b2p.contains(fa));
+
+    // Contains B value
+    EXPECT_FALSE(n2a.contains(fb));
+    EXPECT_TRUE(n2b.contains(fb));
+    EXPECT_TRUE(a2b.contains(fb));
+    EXPECT_TRUE(a2p.contains(fb));
+    EXPECT_TRUE(b2p.contains(fb));
+
+    // Contains (-inf, A)
+    EXPECT_TRUE(n2a.contains(n2a));
+    EXPECT_TRUE(n2b.contains(n2a));
+    EXPECT_FALSE(a2b.contains(n2a));
+    EXPECT_FALSE(a2p.contains(n2a));
+    EXPECT_FALSE(b2p.contains(n2a));
+
+    // Contains (-inf, B)
+    EXPECT_FALSE(n2a.contains(n2b));
+    EXPECT_TRUE(n2b.contains(n2b));
+    EXPECT_FALSE(a2b.contains(n2b));
+    EXPECT_FALSE(a2p.contains(n2b));
+    EXPECT_FALSE(b2p.contains(n2b));
+
+    // Contains (A, B)
+    EXPECT_FALSE(n2a.contains(a2b));
+    EXPECT_TRUE(n2b.contains(a2b));
+    EXPECT_TRUE(a2b.contains(a2b));
+    EXPECT_TRUE(a2p.contains(a2b));
+    EXPECT_FALSE(b2p.contains(a2b));
+
+    // Contains (A, +inf)
+    EXPECT_FALSE(n2a.contains(a2p));
+    EXPECT_FALSE(n2b.contains(a2p));
+    EXPECT_FALSE(a2b.contains(a2p));
+    EXPECT_TRUE(a2p.contains(a2p));
+    EXPECT_FALSE(b2p.contains(a2p));
+
+    // Contains (B, +inf)
+    EXPECT_FALSE(n2a.contains(b2p));
+    EXPECT_FALSE(n2b.contains(b2p));
+    EXPECT_FALSE(a2b.contains(b2p));
+    EXPECT_TRUE(a2p.contains(b2p));
+    EXPECT_TRUE(b2p.contains(b2p));
+};
 
 
 
