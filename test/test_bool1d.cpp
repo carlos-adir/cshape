@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <sstream>
 #include "cshape/bool1d.h"
 
 
@@ -42,8 +44,6 @@ TEST(Bool1DTest, BuildsInterval)
 
 TEST(Bool1DTest, BuildsDisjoint)
 {
-    double fa(-10), fb(10);
-
     std::vector<double> nodes = {-5, 0, 5};
     std::vector<IntervalR1> intervs;
     intervs.push_back(IntervalR1(NEGINF, -10));
@@ -56,18 +56,42 @@ TEST(Bool1DTest, BuildsDisjoint)
 }
 
 
+TEST(Bool1DTest, Printing)
+{
+    std::ostringstream oss1, oss2, oss3, oss4, oss5;
+    oss1 << EMPTYR1;
+    EXPECT_EQ(oss1.str(), "{}");
+    oss2 << WHOLER1;
+    EXPECT_EQ(oss2.str(), "(-inf, +inf)");
+    oss3 << SingleValue(10);
+    EXPECT_EQ(oss3.str(), "10");
+    oss4 << IntervalR1(-10, 10);
+    EXPECT_EQ(oss4.str(), "[-10, 10]");
+}
+
+
 TEST(Bool1DTest, BuildsFromString)
 {
-    double fa(-10), fb(10);
-
-    std::vector<double> nodes = {-5, 0, 5};
-    std::vector<IntervalR1> intervs;
-    intervs.push_back(IntervalR1(NEGINF, -10));
-    intervs.push_back(IntervalR1(10, POSINF));
+    const SubSetR1 *obj1 = string_to_subset("{}");
+    EXPECT_TRUE(*obj1 == EMPTYR1);
     
-    DisjointR1 disj1(nodes);
-    DisjointR1 disj2(intervs);
-    DisjointR1 disj3(nodes, intervs);
+    const SubSetR1 *obj2 = string_to_subset("(-inf, +inf)");
+    EXPECT_TRUE(*obj2 == WHOLER1);
+    
+    const SubSetR1 *obj3 = string_to_subset("{10}");
+    EXPECT_TRUE(*obj3 == SingleValue(10));
+    delete obj3;
+
+    const SubSetR1 *obj4 = string_to_subset("{-10}");
+    EXPECT_TRUE(*obj4 == SingleValue(-10));
+    delete obj4;
+
+    const SubSetR1 *obj5 = string_to_subset("[-10, 10]");
+    EXPECT_TRUE(*obj5 == IntervalR1(-10, 10, true, true));
+    delete obj5;
+
+
+
 }
 
 

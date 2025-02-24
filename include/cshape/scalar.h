@@ -5,13 +5,12 @@
 
 typedef double basetype;
 
-
 class NegativeInfinity;
 class PositiveInfinity;
 
 
 basetype string_to_basetype(const std::string &str){
-    return basetype(atof(str.c_str()));
+    return atof(str.c_str());
 }
 
     
@@ -26,6 +25,8 @@ private:
     NegativeInfinity& operator=(NegativeInfinity&&) = delete;
 
 public:
+    static const std::string STR;
+
     static const NegativeInfinity& getInstance() noexcept {
         static const NegativeInfinity instance;
         return instance;
@@ -66,6 +67,8 @@ private:
     PositiveInfinity& operator=(PositiveInfinity&&) = delete;
 
 public:
+    static const std::string STR;
+
     static const PositiveInfinity& getInstance() noexcept {
         static const PositiveInfinity instance;
         return instance;
@@ -263,16 +266,18 @@ bool operator>(const basetype &lhs, const PositiveInfinity &rhs) {
 
 
 std::ostream &operator<< (std::ostream &os, const NegativeInfinity &value){    
-    os << "-inf";
+    os << NegativeInfinity::STR;
     return os;
 }
 
 std::ostream &operator<< (std::ostream &os, const PositiveInfinity &value){    
-    os << "+inf";
+    os << PositiveInfinity::STR;
     return os;
 }
 
 
+const std::string NegativeInfinity::STR = "-inf";
+const std::string PositiveInfinity::STR = "+inf";
 static const NegativeInfinity& NEGINF = NegativeInfinity::getInstance();
 static const PositiveInfinity& POSINF = PositiveInfinity::getInstance();
 
