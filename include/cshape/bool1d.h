@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <unistd.h>
+#include <sstream>
+#include <string>
 #include <memory>
 
 #include "scalar.h"
@@ -14,251 +16,286 @@ typedef unsigned short uint2;
 typedef unsigned short uint1;
 
 class SubSetR1;
-class EmptyR1;
-class WholeR1;
 class IntervalR1;
-class DisjointR1;
-class SingleValue;
+
+
+
+class IntervalR1{
+private:
+    std::unique_ptr<basetype> sta, end;
+    bool left, right;
+
+    IntervalR1(std::unique_ptr<basetype> sta,
+               std::unique_ptr<basetype> end,
+               const bool closed_left,
+               const bool closed_right);
+public:
+    IntervalR1(const IntervalR1 &other); // Copy constructor
+    IntervalR1(const std::string &str);  // From string to interval
+
+    operator std::string() const;
+    friend std::ostream &operator<< (std::ostream &os, const IntervalR1 &value);
+    friend std::ostream &operator<< (std::ostream &os, const SubSetR1 &obj);
+
+    IntervalR1 &operator=(const std::string &str);
+
+    friend class SubSetR1;
+};
+    
+
 
 
 class SubSetR1{
-public:
-    virtual bool operator==(const SubSetR1 &other) const = 0;
-    virtual bool operator!=(const SubSetR1 &other) const = 0;
-
-    virtual bool contains(const SubSetR1 &other) const = 0;
-    virtual bool contains(const basetype &other) const = 0;
-};
-
-
-class EmptyR1 : public SubSetR1 {
 private:
-    constexpr EmptyR1() noexcept = default;
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
     
-    EmptyR1(const EmptyR1&) = delete;
-    EmptyR1& operator=(const EmptyR1&) = delete;
-    
-    EmptyR1(EmptyR1&&) = delete;
-    EmptyR1& operator=(EmptyR1&&) = delete;
+    SubSetR1(const std::vector<basetype> &finites,
+             const std::vector<IntervalR1> &intervals); // Empty
 
 public:
-    static const std::string STR;
+    SubSetR1();
+    SubSetR1(const SubSetR1 &other); // Copy constructor
+    SubSetR1(const std::string &str); // Transform string to SubSetR1
 
-    static const EmptyR1& getInstance() noexcept {
-        static const EmptyR1 instance;
-        return instance;
-    }
+    // virtual bool operator==(const SubSetR1 &other) const;
+    // virtual bool operator!=(const SubSetR1 &other) const;
 
-    bool operator==(const SubSetR1 &other) const final;
-    bool operator!=(const SubSetR1 &other) const final;
+    // virtual bool contains(const SubSetR1 &other) const;
+    // virtual bool contains(const basetype &other) const;
 
-    bool contains(const SubSetR1 &other) const final;
-    bool contains(const basetype &other) const final;
+    // virtual SubSetR1 operator~() const;
+    // virtual SubSetR1 operator|(const SubSetR1 &other) const;
+    // virtual SubSetR1 operator&(const SubSetR1 &other) const;
 
-    friend std::ostream &operator<< (std::ostream &os, const EmptyR1 &value);
+    static SubSetR1 empty();
+    static SubSetR1 whole();
+    static SubSetR1 single(const basetype &value);
+    static SubSetR1 lower(const basetype &value, const bool closed = true);
+    static SubSetR1 bigger(const basetype &value, const bool closed = true);
+    static SubSetR1 interval(const basetype &sta,
+                             const basetype &end,
+                             const bool closed_left = true,
+                             const bool closed_right = true);
+    static SubSetR1 interval(const NegativeInfinity &sta,
+                             const basetype &end,
+                             const bool closed_left = false,
+                             const bool closed_right = true);
+    static SubSetR1 interval(const basetype &sta,
+                             const PositiveInfinity &end,
+                             const bool closed_left = true,
+                             const bool closed_right = false);
+
+    SubSetR1 &operator=(const SubSetR1 &other);
+    SubSetR1 &operator=(const std::string &other);
+
+    operator std::string() const;
+    friend std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj);
+
 };
 
 
-class WholeR1 : public SubSetR1{
-private:
-    constexpr WholeR1() noexcept = default;
-    
-    WholeR1(const WholeR1&) = delete;
-    WholeR1& operator=(const WholeR1&) = delete;
-    
-    WholeR1(WholeR1&&) = delete;
-    WholeR1& operator=(WholeR1&&) = delete;
-
-public:
-    static const std::string STR;
-
-    static const WholeR1& getInstance() noexcept {
-        static const WholeR1 instance;
-        return instance;
-    }
-
-    bool operator==(const SubSetR1 &other) const final;
-    bool operator!=(const SubSetR1 &other) const final;
-
-    bool contains(const basetype &other) const final;
-    bool contains(const SubSetR1 &other) const final;
-
-    friend std::ostream &operator<< (std::ostream &os, const WholeR1 &value);
-};
-
-
-class SingleValue : public SubSetR1{
-public:
-
-    const basetype internal;
-    
-    SingleValue();
-    SingleValue(const basetype &value);
-    SingleValue(const SingleValue &other); // Copy Finite Single Value
-    ~SingleValue();
-
-    bool operator==(const SubSetR1 &other) const final;
-    bool operator!=(const SubSetR1 &other) const final;
-    virtual bool operator==(const SingleValue &other) const final;
-    virtual bool operator!=(const SingleValue &other) const final;
-
-    bool contains(const basetype &other) const final;
-    bool contains(const SubSetR1 &other) const final;
-
-    friend std::ostream &operator<< (std::ostream &os, const SingleValue &value);
-};
-
-
-
-class IntervalR1 : public SubSetR1 {
-private:
-    const std::unique_ptr<basetype> start, end;
-    const bool closed_left, closed_right;
-public:
-    IntervalR1(std::unique_ptr<basetype> start,
-               std::unique_ptr<basetype> end,
-               const bool closed_left = true,
-               const bool closed_right = true);
-    IntervalR1(const basetype &start,
-               const basetype &end,
-               const bool closed_left = true,
-               const bool closed_right = true);
-    IntervalR1(const NegativeInfinity &start,
-               const basetype &end,
-               const bool closed_left = true,
-               const bool closed_right = true);
-    IntervalR1(const basetype &start,
-               const PositiveInfinity &end,
-               const bool closed_left = true,
-               const bool closed_right = true);
-    IntervalR1(const IntervalR1 &other);
-
-    static IntervalR1 lower(const basetype &endval,
-                            const bool closed = true);
-    static IntervalR1 bigger(const basetype &startval,
-                             const bool closed = true);
-
-    bool operator==(const SubSetR1 &other) const final;
-    bool operator!=(const SubSetR1 &other) const final;
-    virtual bool operator==(const IntervalR1 &other) const final;
-    virtual bool operator!=(const IntervalR1 &other) const final;
-
-    bool contains(const basetype &other) const final;
-    bool contains(const SubSetR1 &other) const final;
-    virtual bool contains(const SingleValue &other) const final;
-    virtual bool contains(const IntervalR1 &other) const final;
-    virtual bool contains(const DisjointR1 &other) const final;
-
-    friend std::ostream &operator<< (std::ostream &os, const IntervalR1 &value);
-};
-
-class DisjointR1 : public SubSetR1 {
-public:
-    const std::vector<basetype> finites;
-    const std::vector<IntervalR1> intervals;
-
-    DisjointR1(const std::vector<basetype> &finites);
-    DisjointR1(const std::vector<IntervalR1> &intervals);
-    DisjointR1(const std::vector<basetype> &finites, const std::vector<IntervalR1> &intervals);
-    
-    bool operator==(const SubSetR1 &other) const final;
-    bool operator!=(const SubSetR1 &other) const final;
-    virtual bool operator==(const DisjointR1 &other) const final;
-    virtual bool operator!=(const DisjointR1 &other) const final;
-    
-    bool contains(const basetype &other) const final;
-    bool contains(const SubSetR1 &other) const final;
-    virtual bool contains(const SingleValue &other) const final;
-    virtual bool contains(const IntervalR1 &other) const final;
-    virtual bool contains(const DisjointR1 &other) const final;
-
-    friend std::ostream &operator<< (std::ostream &os, const DisjointR1 &value);
-};
-
-static const EmptyR1& EMPTYR1 = EmptyR1::getInstance();
-static const WholeR1& WHOLER1 = WholeR1::getInstance();
-
-
-//
-//
-//
-//   CONSTRUCTOR IMPLEMENTATIONS
-//
-//
-//
-
-SingleValue::SingleValue():
-    internal(basetype(0)) {};
-SingleValue::SingleValue(const basetype &value):
-    internal(basetype(value)) {};
-SingleValue::SingleValue(const SingleValue &other):
-    SingleValue(other.internal) {};
-SingleValue::~SingleValue(){};
-
-
-IntervalR1::IntervalR1(std::unique_ptr<basetype> start,
+IntervalR1::IntervalR1(std::unique_ptr<basetype> sta,
                        std::unique_ptr<basetype> end,
                        const bool closed_left,
                        const bool closed_right):
-    start(std::move(start)),
+    sta(std::move(sta)),
     end(std::move(end)),
-    closed_left(closed_left),
-    closed_right(closed_right) {
-};
-
-IntervalR1::IntervalR1(const basetype &start,
-                       const basetype &end,
-                       const bool closed_left,
-                       const bool closed_right):
-    IntervalR1(std::make_unique<basetype>(start),
-               std::make_unique<basetype>(end),
-               closed_left,
-               closed_right) {
-    if(end <= start)
+    left(closed_left),
+    right(closed_right){
+    if (sta != nullptr && end != nullptr && *end <= *sta)   
         throw std::invalid_argument("In interval [start, end], must have 'start < end'");
-};
+}
 
-IntervalR1::IntervalR1(const NegativeInfinity &start,
-                       const basetype &end,
-                       const bool closed_left,
-                       const bool closed_right):
-    IntervalR1(nullptr,
-               std::make_unique<basetype>(end),
-               false,
-               closed_right) {};
-
-IntervalR1::IntervalR1(const basetype &start,
-                       const PositiveInfinity &end,
-                       const bool closed_left,
-                       const bool closed_right):
-    IntervalR1(std::make_unique<basetype>(start),
-               nullptr,
-               closed_left,
-               false) {};
-
-IntervalR1::IntervalR1(const IntervalR1 &other): // Copy constructor
-    IntervalR1(other.start == nullptr ? nullptr : std::make_unique<basetype>(*other.start),
-               other.end == nullptr ? nullptr : std::make_unique<basetype>(*other.end),
-               other.closed_left,
-               other.closed_right){};
+IntervalR1::IntervalR1(const IntervalR1 &other):
+    sta((other.sta == nullptr) ? nullptr : (std::make_unique<basetype>(*other.sta))),
+    end((other.end == nullptr) ? nullptr : (std::make_unique<basetype>(*other.end))),
+    left(other.left),
+    right(other.right){};
 
 
-IntervalR1 IntervalR1::lower(const basetype &endval,
-                             const bool closed){
-    return IntervalR1(NEGINF, endval, false, closed);
-};
-IntervalR1 IntervalR1::bigger(const basetype &startval,
-                              const bool closed){
-return IntervalR1(startval, POSINF, closed, false);
+IntervalR1::IntervalR1(const std::string &str){
+    *this = str;
 };
 
 
-DisjointR1::DisjointR1(const std::vector<basetype> &finites):
-    finites(finites) {};
-DisjointR1::DisjointR1(const std::vector<IntervalR1> &intervals):
-    intervals(intervals) {};
-DisjointR1::DisjointR1(const std::vector<basetype> &finites, const std::vector<IntervalR1> &intervals):
-    finites(finites), intervals(intervals) {};
+
+SubSetR1::SubSetR1(){};
+SubSetR1::SubSetR1(const std::vector<basetype> &finites,
+                   const std::vector<IntervalR1> &intervals):
+    finites(finites), intervals(intervals){
+        const size_t fsize = finites.size();
+        const size_t isize = intervals.size();
+        for (size_t i = 0; i + 1 < fsize; ++i)
+            if (finites[i] >= finites[i+1])
+                throw std::invalid_argument("Not ordered vector!");
+        for (size_t i = 0; i + 1 < isize; ++i){
+            if (intervals[i].end == nullptr)
+                throw std::invalid_argument("Only last interval can end with POSINF");         
+            if (intervals[i+1].sta == nullptr)
+                throw std::invalid_argument("Only first interval can start with NEGINF");
+            if (*intervals[i].end >= *intervals[i+1].sta)
+                throw std::invalid_argument("Intervals are not ordered!");
+        }
+    };
+
+SubSetR1::SubSetR1(const SubSetR1 &other):SubSetR1(other.finites, other.intervals){};
+
+SubSetR1::SubSetR1(const std::string &str){
+    *this = str;
+};
+
+
+SubSetR1 SubSetR1::empty(){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    return SubSetR1(finites, intervals);
+}
+
+SubSetR1 SubSetR1::whole(){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    const IntervalR1 interval(nullptr, nullptr, false, false);
+    intervals.push_back(interval);
+    return SubSetR1(finites, intervals);
+}
+
+
+SubSetR1 SubSetR1::single(const basetype &value){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    finites.push_back(value);
+    return SubSetR1(finites, intervals);
+}
+
+SubSetR1 SubSetR1::lower(const basetype &value, const bool closed){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    const IntervalR1 interval(nullptr, std::make_unique<basetype>(value), false, closed);
+    intervals.push_back(interval);
+    return SubSetR1(finites, intervals);
+}
+
+SubSetR1 SubSetR1::bigger(const basetype &value, const bool closed){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    const IntervalR1 interval(std::make_unique<basetype>(value), nullptr, closed, false);
+    intervals.push_back(interval);
+    return SubSetR1(finites, intervals);
+}
+
+
+SubSetR1 SubSetR1::interval(const basetype &sta,
+                        const basetype &end,
+                        const bool closed_left,
+                        const bool closed_right){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+    const IntervalR1 interval(std::make_unique<basetype>(sta),
+                              std::make_unique<basetype>(end),
+                              closed_left, closed_right);
+    intervals.push_back(interval);
+    return SubSetR1(finites, intervals);
+}
+
+
+SubSetR1 SubSetR1::interval(const NegativeInfinity &sta,
+                        const basetype &end,
+                        const bool closed_left,
+                        const bool closed_right){
+    return SubSetR1::lower(end, closed_right);
+}
+
+
+SubSetR1 SubSetR1::interval(const basetype &sta,
+                            const PositiveInfinity &end,
+                            const bool closed_left,
+                            const bool closed_right){
+    return SubSetR1::bigger(sta, closed_left);
+}
+
+
+
+
+
+
+
+
+
+IntervalR1 &IntervalR1::operator=(const std::string &str) {
+    const size_t size = str.size();
+    this->left = (str[0] == '[');
+    this->right = (str[size - 1] == ']');
+    size_t virg = 1;
+    while (virg < size && str[virg] != ',')
+        ++virg;
+    if (virg == size)
+        throw std::invalid_argument("Invalid string to convert to interval");
+    const std::string first = str.substr(1, virg - 1);
+    const std::string secon = str.substr(virg + 1, size - virg - 2);
+    std::unique_ptr<basetype> sta, end;
+    if (first.find(NegativeInfinity::STR) != std::string::npos)
+        this->sta.reset();
+    else
+        this->sta = std::make_unique<basetype>(string_to_basetype(first));
+    if (secon.find(PositiveInfinity::STR) != std::string::npos)
+        this->end.reset();
+    else
+        this->end = std::make_unique<basetype>(string_to_basetype(secon));
+    return *this;
+};
+
+
+
+
+
+
+SubSetR1 &SubSetR1::operator=(const SubSetR1 &other) {
+    this->finites.clear();
+    this->intervals.clear();
+    for (size_t i = 0; i < other.finites.size(); i++)
+        this->finites.push_back(basetype(other.finites[i]));
+    for (size_t i = 0; i < other.intervals.size(); i++)
+        this->intervals.push_back(IntervalR1(other.intervals[i]));
+    return *this;
+};
+
+SubSetR1 &SubSetR1::operator=(const std::string &str) {
+    const size_t size = str.size();
+    const size_t sta = 0, end = 0;
+    this->finites.clear();
+    this->intervals.clear();
+    if (str == "{}") return *this;
+    for (size_t sta = 0; sta < size; ++sta){
+        if (str[sta] != '(' && str[sta] != '[' && str[sta] != '{')
+            continue;
+        size_t end = sta + 1;
+        while(end < size && str[end] != ')' && str[end] != ']' && str[end] != '}')
+            ++end;
+        const std::string sub = str.substr(sta, end + 1 - sta);
+        const size_t subsize = sub.size();
+        if (sub[0] == '{' && sub[subsize-1] == '}'){
+            for (size_t i = 1; i + 1 < subsize; ++i){
+                size_t j = i + 1;
+                while (j < subsize && sub[j] != ',' && sub[j] != '}')
+                    ++j;
+                const basetype new_value = string_to_basetype(sub.substr(i, j - i));
+                this->finites.push_back(new_value);
+                i = j + 1;
+            }
+            continue;
+        }else{
+            const IntervalR1 new_interv = IntervalR1(sub);
+            this->intervals.push_back(new_interv);
+        }
+        sta = end+1;
+    }
+    return *this;
+};
+
+
+
+
 
 
 // 
@@ -269,410 +306,112 @@ DisjointR1::DisjointR1(const std::vector<basetype> &finites, const std::vector<I
 //
 //
 
-
-std::ostream &operator<< (std::ostream &os, const EmptyR1 &value){    
-    os << EmptyR1::STR;
-    return os;
+IntervalR1::operator std::string() const{
+    std::ostringstream stream;
+    stream << *this;
+    return stream.str();
 }
 
-std::ostream &operator<< (std::ostream &os, const WholeR1 &value){    
-    os << WholeR1::STR;
-    return os;
-}
 
-std::ostream &operator<< (std::ostream &os, const SingleValue &value){    
-    os << value.internal;
-    return os;
-}
-
-std::ostream &operator<< (std::ostream &os, const IntervalR1 &value){
-    os << (value.closed_left ? "[" : "(");
-    if (value.start != NULL)
-        os << *value.start;
+std::ostream &operator<<(std::ostream &os, const IntervalR1 &obj){
+    os << (obj.left ? "[" : "(");
+    if (obj.sta)
+        os << *obj.sta;
     else
-        os << NEGINF.STR;
+        os << NegativeInfinity::STR;
     os << ", ";
-    if (value.end != NULL)
-        os << *value.end;
+    if (obj.end)
+        os << *obj.end;
     else
-        os << POSINF.STR;
-    os << (value.closed_right ? "]" : ")");
+        os << PositiveInfinity::STR;
+    os << (obj.right ? "]" : ")");
     return os;
 }
 
-
-//
-//
-//
-//  EQUALITY COMPARATION
-//
-//
-//
-
-
-bool EmptyR1::operator==(const SubSetR1 &other) const {
-    return typeid(other) == typeid(EmptyR1);
-};
-bool EmptyR1::operator!=(const SubSetR1 &other) const {
-    return typeid(other) != typeid(EmptyR1);
-};
-bool WholeR1::operator==(const SubSetR1 &other) const {
-    return typeid(other) == typeid(WholeR1);
-};
-bool WholeR1::operator!=(const SubSetR1 &other) const {
-    return typeid(other) != typeid(WholeR1);
-};
-
-
-
-bool SingleValue::operator==(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(SingleValue))
-        return false;
-    return this->operator==(*dynamic_cast<const SingleValue*>(&other));
-};
-bool SingleValue::operator!=(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(SingleValue))
-        return true;
-    return this->operator!=(*dynamic_cast<const SingleValue*>(&other));
-};
-bool SingleValue::operator==(const SingleValue &other) const {
-    return this->internal == other.internal;
-};
-bool SingleValue::operator!=(const SingleValue &other) const {
-    return this->internal != other.internal;
-};
-
-
-
-bool IntervalR1::operator==(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(IntervalR1))
-        return false;
-    return this->operator==(*dynamic_cast<const IntervalR1*>(&other));
-};
-bool IntervalR1::operator!=(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(IntervalR1))
-        return true;
-    return this->operator!=(*dynamic_cast<const IntervalR1*>(&other));
-};
-bool IntervalR1::operator==(const IntervalR1 &other) const {
-    return *start == *other.start && *end == *other.end;
-};
-bool IntervalR1::operator!=(const IntervalR1 &other) const {
-    return *start != *other.start || *end != *other.end;
-};
-
-bool DisjointR1::operator==(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(IntervalR1))
-        return false;
-    return this->operator==(*dynamic_cast<const DisjointR1*>(&other));
-};
-bool DisjointR1::operator!=(const SubSetR1 &other) const {
-    if (typeid(other) != typeid(IntervalR1))
-        return true;
-    return this->operator!=(*dynamic_cast<const DisjointR1*>(&other));
-};
-bool DisjointR1::operator==(const DisjointR1 &other) const {
-    throw std::runtime_error("Not yet implemented");
-    return false;
-};
-bool DisjointR1::operator!=(const DisjointR1 &other) const {
-    throw std::runtime_error("Not yet implemented");
-    return false;
-};
-
-
-
-// 
-//
-//
-//  Contains implementations
-// 
-//
-//
-
-
-
-bool EmptyR1::contains(const basetype &other) const {
-    return false;
-}
-
-bool WholeR1::contains(const basetype &other) const {
-    return true;
-}
-
-bool SingleValue::contains(const basetype &other) const {
-    return this->internal == other;
-}
-
-bool IntervalR1::contains(const basetype &other) const {
-    return this->contains(SingleValue(other));
-}
-
-bool DisjointR1::contains(const basetype &other) const {
-    return this->contains(SingleValue(other));
+SubSetR1::operator std::string() const{
+    std::ostringstream stream;
+    stream << *this;
+    return stream.str();
 }
 
 
-
-
-
-
-
-bool EmptyR1::contains(const SubSetR1 &other) const {
-    return typeid(other) == typeid(EmptyR1);
-}
-
-bool WholeR1::contains(const SubSetR1 &other) const {
-    return true;
-}
-
-bool SingleValue::contains(const SubSetR1 &other) const {
-    if (typeid(other) == typeid(SingleValue))
-        return this->operator==(*dynamic_cast<const SingleValue*>(&other));
-    return typeid(other) == typeid(EmptyR1);
-};
-
-
-bool IntervalR1::contains(const SubSetR1 &other) const {
-    if (typeid(other) == typeid(SingleValue))
-        return this->contains(*dynamic_cast<const SingleValue*>(&other));
-    if (typeid(other) == typeid(IntervalR1))
-        return this->contains(*dynamic_cast<const IntervalR1*>(&other));
-    if (typeid(other) == typeid(DisjointR1))
-        return this->contains(*dynamic_cast<const DisjointR1*>(&other));
-    return typeid(other) == typeid(EmptyR1);
-};
-
-
-bool DisjointR1::contains(const SubSetR1 &other) const {
-    if (typeid(other) == typeid(DisjointR1))
-        return this->contains(*dynamic_cast<const DisjointR1*>(&other));
-    if (typeid(other) == typeid(IntervalR1))
-        return this->contains(*dynamic_cast<const IntervalR1*>(&other));
-    if (typeid(other) == typeid(SingleValue))
-        return this->contains(*dynamic_cast<const SingleValue*>(&other));
-    return typeid(other) == typeid(EmptyR1());
-};
-
-
-
-
-
-
-
-
-
-
-
-
-bool IntervalR1::contains(const SingleValue &other) const {
-    if (this->start != NULL){
-        if (other.internal < *this->start)
-            return false;
-        if (!this->closed_left && other.internal == *this->start)
-            return false;
+std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj){
+    const size_t fsize = obj.finites.size();
+    const size_t isize = obj.intervals.size();
+    if (fsize == 0 && isize == 0){
+        os << "{}";
+        return os;
+    } else if (fsize == 0){
+        os << obj.intervals[0];
+        for (size_t i = 1; i < isize; ++i)
+            os << " U " << obj.intervals[i];
+        return os;
+    } else if (isize == 0){
+        os << "{" << obj.finites[0];
+        for (size_t f = 1; f < isize; ++f)
+            os << ", " << obj.finites[f];
+        os << "}";
+        return os;
     }
-    if (this->end != NULL){
-        if (*this->end < other.internal)
-            return false;
-        if (!this->closed_right && other.internal == *this->start)
-            return false;
-    }
-    return true;
-};
 
-bool IntervalR1::contains(const IntervalR1 &other) const {
-    if (other.start == NULL && this->start != NULL)
-        return false;
-    if (other.end == NULL && this->end != NULL)
-        return false;
-    if (this->start && *other.start < *this->start)
-        return false;
-    if (this->end && *this->end < *other.end)
-        return false;
-    return true;
-};
-
-bool IntervalR1::contains(const DisjointR1 &other) const {
-    for (uint1 i = 0; i < other.finites.size(); i++)
-        if (!this->contains(other.finites[i]))
-            return false;
-    for (uint1 i = 0; i < other.intervals.size(); i++)
-        if (!this->contains(other.intervals[i]))
-            return false;
-    return true;
-};
-
-
-
-
-bool DisjointR1::contains(const SingleValue &other) const {
-    for (uint1 i = 0; i < this->intervals.size(); i++)
-        if ((this->intervals[i]).contains(other))
-            return true;
-    for (uint1 i = 0; i < this->finites.size(); i++)
-        if (this->finites[i] == other.internal)
-            return true;
-    return false;
-};
-
-bool DisjointR1::contains(const IntervalR1 &other) const {
-    for (uint1 i = 0; i < this->intervals.size(); i++)
-        if ((this->intervals[i]).contains(other))
-            return true;
-    return false;
-};
-
-bool DisjointR1::contains(const DisjointR1 &other) const {
-    for (uint i = 0; i < other.intervals.size(); i++)
-        if (!this->contains(other.intervals[i]))
-            return false;
-    for (uint i = 0; i < other.finites.size(); i++)
-        if (!this->contains(other.finites[i]))
-            return false;
-    return true;
-};
-
-
-
-
-bool operator==(const basetype &lhs, const SubSetR1 &rhs) {
-    if (typeid(rhs) != typeid(SingleValue))
-        return false;
-    return dynamic_cast<const SingleValue*>(&rhs)->internal == lhs;
-};
-bool operator!=(const basetype &lhs, const SubSetR1 &rhs) {
-    if (typeid(rhs) != typeid(SingleValue))
-        return true;
-    return dynamic_cast<const SingleValue*>(&rhs)->internal == lhs;
-};
-
-
-
-std::vector<basetype> finite_set_from_str(const std::string &str){
-    std::vector<basetype> finites;
-    for (size_t i = 0; i < str.size(); ++i){
-        size_t j = i + 1;
-        while (j < str.size() && str[j] != ',' && str[j] != '}')
-            ++j;
-        const std::string sub = str.substr(i+1, j-i-1);
-        const basetype finite = string_to_basetype(sub);
-        finites.push_back(finite);
-        i = j+1;
-    }
-    return finites;
-}
-
-IntervalR1 interval_from_str(const std::string &str){
-    const size_t size = str.size();
-    const bool closed_left = (str[0] == '[');
-    const bool closed_right = (str[size-1] == ']');
-
-    size_t comma = 0;
-    while (comma < size && str[comma] != ',')
-        ++comma;
-    const std::string left = str.substr(1, comma - 1);
-    const std::string righ = str.substr(comma+1, size - comma - 2);
-    // Check for infinity
-    if (left.find(NEGINF.STR) != std::string::npos){
-        const basetype end = string_to_basetype(righ); 
-        return IntervalR1::bigger(end, closed_right);
-    }
-    if (righ.find(POSINF.STR) != std::string::npos){
-        const basetype sta = string_to_basetype(left); 
-        return IntervalR1::lower(sta, closed_left);
-    }
-    const basetype sta = string_to_basetype(left); 
-    const basetype end = string_to_basetype(righ); 
-    const IntervalR1 interval(sta, end, closed_left, closed_right);
-    return interval;
-}
-
-
-
-bool valid_string_to_convert_to_subset(const std::string &str){
-    bool braces = false, brackets = false;
-    for (size_t i = 0; i < str.size(); i++){
-        switch (str[i])
-        {
-            case ' ':
-                break;
-            case 'U':
-                if (braces || brackets)
-                    return false;
-                break;
-            case ',':
-                if (!(braces || brackets))
-                    return false;
-                break;
-            case '{':
-                if (braces)
-                    return false;
-                braces = true;
-                break;
-            case '}':
-                if (!braces)
-                    return false;
-                braces = false;
-                break;
-            case '(':
-            case '[':
-                if (brackets)
-                    return false;
-                brackets = true;
-                break;
-            case ')':
-            case ']':
-                if (!brackets)
-                    return false;
-                brackets = false;
-                break;
-            default:
-                break;
-        }
-    }
-    return true;
-}
-
-
-
-SubSetR1 const *string_to_subset(const std::string &str){
-    if (!valid_string_to_convert_to_subset(str))
-        throw std::invalid_argument("Invalid string to convert to subset");
-
-    if (str == EmptyR1::STR)
-        return &EMPTYR1;
-    if (str == WholeR1::STR)
-        return &WHOLER1;
-    std::vector<basetype> finites;
-    std::vector<IntervalR1> intervs;
+    std::vector<std::string> msgs;
+    std::vector<basetype> finis;
+    bool first = true;
+    bool flag = false;
+    size_t i = 0, f = 0;
     
-    const size_t size = str.size();
-    for (size_t sta = 0; sta < size; ++sta){
-        if (str[sta] != '{' && str[sta] == '[' && str[sta] == '(')
-            continue;
-        size_t end = sta + 1;
-        while (end < size && str[end] != '}' && str[end] != ')' && str[end] != ']')
-            ++end;
-        const std::string sub = str.substr(sta, end-sta + 1);
-        if (sub[0] != '{'){
-            const IntervalR1 interval = interval_from_str(sub);
-            intervs.push_back(interval);
-        }else{
-            const std::vector<basetype> new_finites = finite_set_from_str(sub);
-            finites.insert(finites.end(),new_finites.begin(), new_finites.end());
-        }
-        sta = end + 1;
+    if (obj.intervals[0].sta == nullptr){
+        os << obj.intervals[0];
+        ++i;
+        first = false;
     }
-    if (finites.size() == 1 && intervs.size() == 0)
-        return new SingleValue(finites[0]);
-    if (finites.size() == 0 && intervs.size() == 1)
-        return new IntervalR1(intervs[0]);
-    return new DisjointR1(finites, intervs);
+    while (i < isize && f < fsize){
+        if (obj.finites[f] < *obj.intervals[i].sta){
+            if (!flag){
+                if (!first){
+                    os << " U ";
+                }
+                os << "{";
+                first = false;
+                flag = true;
+            }else
+                os << ", ";
+            os << obj.finites[f];
+            ++f;
+            continue;
+        }
+        if (flag){
+            os << "}";
+            flag = false;
+        }
+        if (!first)
+            os << " U ";
+        first = false;
+        os << obj.intervals[i];
+        ++i;
+    }
+    if (f < fsize){
+        if (!flag){
+            if (!first)
+                os << " U ";
+            os << "{";
+            first = false;
+            flag = true;
+        }else{
+            os << ", ";
+        }
+        os << obj.finites[f];
+        ++f;
+        for (; f < fsize; ++f)
+            os << ", " << obj.finites[f];
+    }
+    if (flag)
+        os << "}";
+    for (; i < isize; ++i)
+        os << " U " << obj.intervals[i];
+    return os;
 }
 
-const std::string EmptyR1::STR = "{}";
-const std::string WholeR1::STR = "(" + NegativeInfinity::STR + ", " + PositiveInfinity::STR + ")";
 
 
 

@@ -119,3 +119,16 @@ TEST(ScalarTest, CompareDoubleInfinity)
     EXPECT_TRUE(finite != POSINF);
 }
 
+
+TEST(ScalarTest, FromString)
+{
+    
+    EXPECT_EQ(string_to_basetype("-10"), -10);
+    EXPECT_EQ(string_to_basetype("-5"), -5);
+    EXPECT_EQ(string_to_basetype("-1"), -1);
+    EXPECT_EQ(string_to_basetype("-0"), 0);
+    EXPECT_EQ(string_to_basetype("+0"), 0);
+    EXPECT_EQ(string_to_basetype("+1"), 1);
+    EXPECT_EQ(string_to_basetype("+5"), 5);
+
+}
