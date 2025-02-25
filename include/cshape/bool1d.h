@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <memory>
+#include <set>
 
 #include "scalar.h"
 
@@ -18,6 +19,9 @@ typedef unsigned short uint1;
 class SubSetR1;
 class IntervalR1;
 
+
+SubSetR1 compute_middle(const std::vector<basetype> &knots,
+                        const std::vector<bool> &inside);
 
 
 class IntervalR1{
@@ -46,6 +50,8 @@ public:
     bool operator!=(const IntervalR1 &other) const;
 
     friend class SubSetR1;
+    friend SubSetR1 compute_middle(const std::vector<basetype> &knots,
+                                   const std::vector<bool> &inside);
 };
     
 
@@ -64,15 +70,8 @@ public:
     SubSetR1(const SubSetR1 &other); // Copy constructor
     SubSetR1(const std::string &str); // Transform string to SubSetR1
 
-    // virtual bool operator==(const SubSetR1 &other) const;
-    // virtual bool operator!=(const SubSetR1 &other) const;
-
     virtual bool contains(const SubSetR1 &other) const;
     virtual bool contains(const basetype &other) const;
-
-    // virtual SubSetR1 operator~() const;
-    // virtual SubSetR1 operator|(const SubSetR1 &other) const;
-    // virtual SubSetR1 operator&(const SubSetR1 &other) const;
 
     static SubSetR1 empty();
     static SubSetR1 whole();
@@ -94,12 +93,21 @@ public:
 
     SubSetR1 &operator=(const SubSetR1 &other);
     SubSetR1 &operator=(const std::string &other);
+    SubSetR1 operator~() const;
+    SubSetR1 operator|(const SubSetR1 &other) const;
+    SubSetR1 operator&(const SubSetR1 &other) const;
+    SubSetR1 &operator|=(const SubSetR1 &other);
+    SubSetR1 &operator&=(const SubSetR1 &other);
 
     bool operator==(const SubSetR1 &other) const;
     bool operator!=(const SubSetR1 &other) const;
+    bool operator==(const std::string &other) const;
+    bool operator!=(const std::string &other) const;
 
     operator std::string() const;
     friend std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj);
+    friend SubSetR1 compute_middle(const std::vector<basetype> &knots,
+                                   const std::vector<bool> &inside);
 
 };
 
@@ -130,6 +138,7 @@ IntervalR1::IntervalR1(const std::string &str){
 
 
 SubSetR1::SubSetR1(){};
+
 SubSetR1::SubSetR1(const std::vector<basetype> &finites,
                    const std::vector<IntervalR1> &intervals):
     finites(finites), intervals(intervals){
@@ -161,6 +170,7 @@ SubSetR1 SubSetR1::empty(){
     return SubSetR1(finites, intervals);
 }
 
+
 SubSetR1 SubSetR1::whole(){
     std::vector<basetype> finites;
     std::vector<IntervalR1> intervals;
@@ -177,6 +187,7 @@ SubSetR1 SubSetR1::single(const basetype &value){
     return SubSetR1(finites, intervals);
 }
 
+
 SubSetR1 SubSetR1::lower(const basetype &value, const bool closed){
     std::vector<basetype> finites;
     std::vector<IntervalR1> intervals;
@@ -184,6 +195,7 @@ SubSetR1 SubSetR1::lower(const basetype &value, const bool closed){
     intervals.push_back(interval);
     return SubSetR1(finites, intervals);
 }
+
 
 SubSetR1 SubSetR1::bigger(const basetype &value, const bool closed){
     std::vector<basetype> finites;
@@ -268,6 +280,14 @@ bool SubSetR1::operator!=(const SubSetR1 &other) const{
     return !(this->operator==(other));
 }
 
+bool SubSetR1::operator==(const std::string &other) const{
+    return this->operator==(SubSetR1(other));
+}
+
+bool SubSetR1::operator!=(const std::string &other) const{
+    return !this->operator==(SubSetR1(other));;
+}
+
 
 
 
@@ -343,8 +363,182 @@ SubSetR1 &SubSetR1::operator=(const std::string &str) {
 };
 
 
+//
+//
+//
+//  Boolean operations
+//
+//
+//
+
+SubSetR1 SubSetR1::operator~() const{
+    if (this->finites.size() == 0){
+        if (this->intervals.size() == 0)
+            return SubSetR1::whole();
+        if (this->intervals.size() == 1){
+            const IntervalR1 &interval = this->intervals[0];
+            SubSetR1 result = SubSetR1::empty();
+            if (interval.sta != nullptr)
+                result |= SubSetR1::lower(*interval.sta, !interval.left);
+            if (interval.end != nullptr)
+                result |= SubSetR1::bigger(*interval.end, !interval.right);
+            return result;
+        }
+    }
+    
+    std::set<basetype> setknots;
+    for (size_t i = 0; i < this->finites.size(); ++i)
+        setknots.insert(this->finites[i]);
+    for (size_t i = 0; i < this->intervals.size(); ++i){
+        const IntervalR1 &interval = this->intervals[i];
+        if (interval.sta != nullptr)
+            setknots.insert(*interval.sta);
+        if (interval.end != nullptr)
+            setknots.insert(*interval.end);
+    }
+    const std::vector<basetype> knots(setknots.begin(), setknots.end());
+
+    std::vector<bool> inside(2 * knots.size() + 1, false);
+    inside[0] = !this->contains(knots[0] - 1);
+    for (size_t i = 0; i < knots.size(); ++i)
+        inside[2*i + 1] = !this->contains(knots[i]);
+    for (size_t i = 1; i < knots.size(); ++i){
+        const basetype middle = (knots[i-1] + knots[i]) / 2;
+        inside[2 * i] = !this->contains(middle);
+    }
+    const basetype last = knots[knots.size() - 1] + 1;
+    inside[2 * knots.size()] = !this->contains(last);
+    return compute_middle(knots, inside);
+};
+
+SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const{
+    if (this->contains(other))  // Take cares of whole |= other or *this |= empty
+        return SubSetR1(*this);
+    if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
+        return SubSetR1(other);
+
+    std::set<basetype> setknots;
+    for (size_t i = 0; i < this->finites.size(); ++i)
+        setknots.insert(this->finites[i]);
+    for (size_t i = 0; i < other.finites.size(); ++i)
+        setknots.insert(other.finites[i]);
+    for (size_t i = 0; i < this->intervals.size(); ++i){
+        const IntervalR1 &interv = this->intervals[i];
+        if (interv.sta) setknots.insert(*interv.sta);
+        if (interv.end) setknots.insert(*interv.end);
+    }
+    for (size_t i = 0; i < other.intervals.size(); ++i){
+        const IntervalR1 &interv = other.intervals[i];
+        if (interv.sta) setknots.insert(*interv.sta);
+        if (interv.end) setknots.insert(*interv.end);
+    }
+    const std::vector<basetype> knots(setknots.begin(), setknots.end());
+    std::vector<bool> inside(2 * knots.size() + 1, false);
+
+    inside[0] = this->contains(knots[0] - 1) || other.contains(knots[0] - 1);
+    for (size_t i = 0; i < knots.size(); ++i)
+        inside[2*i + 1] = this->contains(knots[i]) || other.contains(knots[i]);
+    for (size_t i = 1; i < knots.size(); ++i){
+        const basetype midknot = (knots[i - 1] + knots[i]) / 2;
+        inside[2 * i] = this->contains(midknot) || other.contains(midknot);
+    }
+    const basetype last = knots[knots.size() - 1] + 1;
+    inside[2 * knots.size()] = this->contains(last) || other.contains(last);
+    return compute_middle(knots, inside);
+};
 
 
+SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const{
+    if (this->contains(other))  // Take cares of whole |= other or *this |= empty
+        return SubSetR1(*this);
+    if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
+        return SubSetR1(other);
+
+    std::set<basetype> setknots;
+    for (size_t i = 0; i < this->finites.size(); ++i)
+        setknots.insert(this->finites[i]);
+    for (size_t i = 0; i < other.finites.size(); ++i)
+        setknots.insert(other.finites[i]);
+    for (size_t i = 0; i < this->intervals.size(); ++i){
+        const IntervalR1 &interv = this->intervals[i];
+        if (interv.sta) setknots.insert(*interv.sta);
+        if (interv.end) setknots.insert(*interv.end);
+    }
+    for (size_t i = 0; i < other.intervals.size(); ++i){
+        const IntervalR1 &interv = other.intervals[i];
+        if (interv.sta) setknots.insert(*interv.sta);
+        if (interv.end) setknots.insert(*interv.end);
+    }
+    const std::vector<basetype> knots(setknots.begin(), setknots.end());
+    std::vector<bool> inside(2 * knots.size() + 1, false);
+
+    inside[0] = this->contains(knots[0] - 1) && other.contains(knots[0] - 1);
+    for (size_t i = 0; i < knots.size(); ++i)
+        inside[2*i + 1] = this->contains(knots[i]) && other.contains(knots[i]);
+    for (size_t i = 1; i < knots.size(); ++i){
+        const basetype midknot = (knots[i-1] + knots[i]) / 2;
+        inside[2*i] = this->contains(midknot) && other.contains(midknot);
+    }
+    const basetype last = knots[knots.size() - 1] + 1;
+    inside[2 * knots.size()] = this->contains(last) && other.contains(last);
+    return compute_middle(knots, inside);
+};
+
+
+SubSetR1 &SubSetR1::operator|=(const SubSetR1 &other){
+    if (this->contains(other)) // Take cares of whole |= other or *this |= empty
+        return *this;
+    *this = this->operator|(other);
+    return *this;
+};
+
+
+SubSetR1 &SubSetR1::operator&=(const SubSetR1 &other){
+    if (other.contains(*this)) // Take cares of empty &= other or *this &= whole
+        return *this;
+    *this = this->operator&(other);
+    return *this;
+};
+
+
+SubSetR1 compute_middle(const std::vector<basetype> &knots,
+                        const std::vector<bool> &inside){
+    std::vector<basetype> finites;
+    std::vector<IntervalR1> intervals;
+
+    std::unique_ptr<basetype> sta = nullptr;
+    bool closed = false;
+    for(size_t i = 0; i < knots.size(); ++i){
+        const basetype &knot = knots[i];
+        const bool left = inside[2*i];
+        const bool midd = inside[2*i+1];
+        const bool righ = inside[2*i+2];
+        if (left == midd && midd == righ)
+            continue;  // Take care of two of 8 cases
+        if (!left && !righ){ // single finite value
+            finites.push_back(knot);
+            continue;
+        }
+        if (left){ // finish interval
+            const IntervalR1 interval(std::move(sta),
+                                      std::make_unique<basetype>(knot),
+                                      closed,
+                                      midd);
+            intervals.push_back(interval);
+            sta = nullptr;
+        }
+        if (righ){ // start new interval
+            sta = std::make_unique<basetype>(knot);
+            closed = midd;
+        }
+    }
+    if (sta != nullptr){
+        const IntervalR1 interval(std::move(sta), nullptr, closed, false);
+        intervals.push_back(interval);
+    }
+    const SubSetR1 result = SubSetR1(finites, intervals);
+    return result;
+}
 
 
 // 
@@ -461,6 +655,14 @@ std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj){
     return os;
 }
 
+
+//
+//
+//
+//  Contains
+//
+//
+//
 
 
 bool IntervalR1::contains(const basetype &other) const{

@@ -208,3 +208,40 @@ TEST(Bool1DTest, ContainsInterval)
 
 
 
+
+
+TEST(Bool1DTest, InvertInterval)
+{
+    double fa(-10), fb(10);
+    SubSetR1 empty = SubSetR1::empty();
+    SubSetR1 whole = SubSetR1::whole();
+    EXPECT_TRUE(empty == empty);
+    EXPECT_TRUE(whole == whole);
+    EXPECT_TRUE(~empty == whole);
+    EXPECT_TRUE(~whole == empty);
+
+
+    SubSetR1 n2a = SubSetR1::interval(NEGINF, fa);
+    SubSetR1 n2b = SubSetR1::interval(NEGINF, fb);
+    SubSetR1 a2b = SubSetR1::interval(fa, fb);
+    SubSetR1 a2p = SubSetR1::interval(fa, POSINF);
+    SubSetR1 b2p = SubSetR1::interval(fb, POSINF);
+
+    EXPECT_TRUE(empty == empty);
+    EXPECT_TRUE(whole == whole);
+    EXPECT_TRUE(~empty == whole);
+    EXPECT_TRUE(~whole == empty);
+
+    EXPECT_EQ(~n2a, "(-10, +inf)");
+    EXPECT_EQ(~n2b, "(10, +inf)");
+    EXPECT_EQ(~a2b, "(-inf, -10) U (10, +inf)");
+    EXPECT_EQ(~a2p, "(-inf, -10)");
+    EXPECT_EQ(~b2p, "(-inf, 10)");
+
+    EXPECT_EQ(~(~n2a), n2a);
+    EXPECT_EQ(~(~n2b), n2b);
+    EXPECT_EQ(~(~a2b), a2b);
+    EXPECT_EQ(~(~a2p), a2p);
+    EXPECT_EQ(~(~b2p), b2p);
+
+}
