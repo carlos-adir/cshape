@@ -9,11 +9,8 @@
 
 TEST(ScalarTest, ConstructorSingleton)
 {
-    const NegativeInfinity& botinf = NegativeInfinity::getInstance();
-    const PositiveInfinity& topinf = PositiveInfinity::getInstance();
-    
-    EXPECT_TRUE(&topinf == &POSINF);
-    EXPECT_TRUE(&botinf == &NEGINF);
+    EXPECT_TRUE(0 < POSINF);
+    EXPECT_TRUE(NEGINF < 0);
 }
 
 
@@ -123,12 +120,12 @@ TEST(ScalarTest, CompareDoubleInfinity)
 TEST(ScalarTest, FromString)
 {
     
-    EXPECT_EQ(string_to_basetype("-10"), -10);
-    EXPECT_EQ(string_to_basetype("-5"), -5);
-    EXPECT_EQ(string_to_basetype("-1"), -1);
-    EXPECT_EQ(string_to_basetype("-0"), 0);
-    EXPECT_EQ(string_to_basetype("+0"), 0);
-    EXPECT_EQ(string_to_basetype("+1"), 1);
-    EXPECT_EQ(string_to_basetype("+5"), 5);
+    EXPECT_EQ(string_to_scalar("-10"), -10);
+    EXPECT_EQ(string_to_scalar("-5"), -5);
+    EXPECT_EQ(string_to_scalar("-1"), -1);
+    EXPECT_EQ(string_to_scalar("-0"), 0);
+    EXPECT_EQ(string_to_scalar("+0"), 0);
+    EXPECT_EQ(string_to_scalar("+1"), 1);
+    EXPECT_EQ(string_to_scalar("+5"), 5);
 
 }

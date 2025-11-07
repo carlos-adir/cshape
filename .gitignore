@@ -1,5 +1,6 @@
 console/*
 build/*
+CMakeFiles/*
 
 # Prerequisites
 *.d

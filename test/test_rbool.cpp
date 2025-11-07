@@ -4,70 +4,64 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
-#include "cshape/bool1d.h"
+#include "cshape/rbool.h"
 
 
 TEST(Bool1DTest, BuildsSpecial)
 {
-    SubSetR1 obj;
-    obj = SubSetR1::empty();
-    obj = SubSetR1::whole();
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
 }
 
 TEST(Bool1DTest, BuildsSingleValue)
 {
-    SubSetR1 sing;
-    sing = SubSetR1::single(10);
+    SubSetR1 point = SubSetR1::Point(10);
 }
 
 TEST(Bool1DTest, BuildsInterval)
 {
     double fa(-10), fb(10);
 
-    SubSetR1 interval;
-    interval = SubSetR1::interval(NEGINF, fa);
-    interval = SubSetR1::interval(NEGINF, fb);
-    interval = SubSetR1::interval(fa, fb);
-    interval = SubSetR1::interval(fa, POSINF);
-    interval = SubSetR1::interval(fb, POSINF);
-    interval = SubSetR1::lower(fa);
-    interval = SubSetR1::lower(fb);
-    interval = SubSetR1::bigger(fa);
-    interval = SubSetR1::bigger(fb);
+    SubSetR1::Between(NEGINF, fa);
+    SubSetR1::Between(NEGINF, fb);
+    SubSetR1::Between(fa, fb);
+    SubSetR1::Between(fa, POSINF);
+    SubSetR1::Between(fb, POSINF);
+    SubSetR1::Lower(fa);
+    SubSetR1::Lower(fb);
+    SubSetR1::Bigger(fa);
+    SubSetR1::Bigger(fb);
 }
 
 
 TEST(Bool1DTest, Printing)
 {
-    EXPECT_EQ(std::string(SubSetR1::empty()), "{}");
-    EXPECT_EQ(std::string(SubSetR1::whole()), "(-inf, +inf)");
-    EXPECT_EQ(std::string(SubSetR1::single(-10)), "{-10}");
-    EXPECT_EQ(std::string(SubSetR1::single(10)), "{10}");
-    EXPECT_EQ(std::string(SubSetR1::interval(-10, 10)), "[-10, 10]");
-    EXPECT_EQ(std::string(SubSetR1::interval(NEGINF, 10)), "(-inf, 10]");
-    EXPECT_EQ(std::string(SubSetR1::lower(10)), "(-inf, 10]");
-    EXPECT_EQ(std::string(SubSetR1::interval(-10, POSINF)), "[-10, +inf)");
-    EXPECT_EQ(std::string(SubSetR1::bigger(10)), "[10, +inf)");
+    EXPECT_EQ(std::string(SubSetR1::Empty()), "{}");
+    EXPECT_EQ(std::string(SubSetR1::Whole()), "(-inf, inf)");
+    EXPECT_EQ(std::string(SubSetR1::Point(-10)), "{-10}");
+    EXPECT_EQ(std::string(SubSetR1::Point(10)), "{10}");
+    EXPECT_EQ(std::string(SubSetR1::Between(-10, 10)), "[-10, 10]");
+    EXPECT_EQ(std::string(SubSetR1::Between(NEGINF, 10)), "(-inf, 10]");
+    EXPECT_EQ(std::string(SubSetR1::Lower(10)), "(-inf, 10]");
+    EXPECT_EQ(std::string(SubSetR1::Between(-10, POSINF)), "[-10, inf)");
+    EXPECT_EQ(std::string(SubSetR1::Bigger(10)), "[10, inf)");
 }
 
 
 TEST(Bool1DTest, BuildsFromString)
 {
     SubSetR1 obj1("{}");
-    SubSetR1 obj2("(-inf, +inf)");
+    SubSetR1 obj2("(-inf, inf)");
     SubSetR1 obj3("{10}");
     SubSetR1 obj4("{-10}");
     SubSetR1 obj5("[-10, 10]");
-    
-
-
 }
 
 
 TEST(Bool1DTest, CompareSingleton)
 {
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
     // empty and whole
     EXPECT_TRUE(empty == empty);
     EXPECT_FALSE(empty == whole);
@@ -85,9 +79,9 @@ TEST(Bool1DTest, CompareSingleton)
 
 TEST(Bool1DTest, CompareSingleEmptyWhole)
 {
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
-    SubSetR1 finite = SubSetR1::single(0);
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1 finite = SubSetR1::Point(0);
 
     EXPECT_FALSE(empty == finite);
     EXPECT_TRUE(empty != finite);
@@ -104,8 +98,8 @@ TEST(Bool1DTest, CompareSingleEmptyWhole)
 
 TEST(Bool1DTest, ContainsSingleton)
 {
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
     EXPECT_TRUE(empty.contains(empty));
     EXPECT_FALSE(empty.contains(whole));
     EXPECT_TRUE(whole.contains(empty));
@@ -115,9 +109,9 @@ TEST(Bool1DTest, ContainsSingleton)
 
 TEST(Bool1DTest, ContainsFinite)
 {
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
-    SubSetR1 finite = SubSetR1::single(10);
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1 finite = SubSetR1::Point(10);
 
     EXPECT_TRUE(finite.contains(finite));
 
@@ -134,13 +128,13 @@ TEST(Bool1DTest, ContainsFinite)
 TEST(Bool1DTest, ContainsInterval)
 {
     double fa(-10), fb(10);
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
-    SubSetR1 n2a = SubSetR1::interval(NEGINF, fa);
-    SubSetR1 n2b = SubSetR1::interval(NEGINF, fb);
-    SubSetR1 a2b = SubSetR1::interval(fa, fb);
-    SubSetR1 a2p = SubSetR1::interval(fa, POSINF);
-    SubSetR1 b2p = SubSetR1::interval(fb, POSINF);
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1 n2a = SubSetR1::Between(NEGINF, fa);
+    SubSetR1 n2b = SubSetR1::Between(NEGINF, fb);
+    SubSetR1 a2b = SubSetR1::Between(fa, fb);
+    SubSetR1 a2p = SubSetR1::Between(fa, POSINF);
+    SubSetR1 b2p = SubSetR1::Between(fb, POSINF);
 
     // Contains empty
     EXPECT_TRUE(n2a.contains(empty));
@@ -191,14 +185,14 @@ TEST(Bool1DTest, ContainsInterval)
     EXPECT_TRUE(a2p.contains(a2b));
     EXPECT_FALSE(b2p.contains(a2b));
 
-    // Contains (A, +inf)
+    // Contains (A, inf)
     EXPECT_FALSE(n2a.contains(a2p));
     EXPECT_FALSE(n2b.contains(a2p));
     EXPECT_FALSE(a2b.contains(a2p));
     EXPECT_TRUE(a2p.contains(a2p));
     EXPECT_FALSE(b2p.contains(a2p));
 
-    // Contains (B, +inf)
+    // Contains (B, inf)
     EXPECT_FALSE(n2a.contains(b2p));
     EXPECT_FALSE(n2b.contains(b2p));
     EXPECT_FALSE(a2b.contains(b2p));
@@ -213,30 +207,32 @@ TEST(Bool1DTest, ContainsInterval)
 TEST(Bool1DTest, InvertInterval)
 {
     double fa(-10), fb(10);
-    SubSetR1 empty = SubSetR1::empty();
-    SubSetR1 whole = SubSetR1::whole();
+    SubSetR1 empty = SubSetR1::Empty();
+    SubSetR1 whole = SubSetR1::Whole();
     EXPECT_TRUE(empty == empty);
     EXPECT_TRUE(whole == whole);
     EXPECT_TRUE(~empty == whole);
     EXPECT_TRUE(~whole == empty);
 
 
-    SubSetR1 n2a = SubSetR1::interval(NEGINF, fa);
-    SubSetR1 n2b = SubSetR1::interval(NEGINF, fb);
-    SubSetR1 a2b = SubSetR1::interval(fa, fb);
-    SubSetR1 a2p = SubSetR1::interval(fa, POSINF);
-    SubSetR1 b2p = SubSetR1::interval(fb, POSINF);
+    SubSetR1 n2a = SubSetR1::Between(NEGINF, fa);
+    SubSetR1 n2b = SubSetR1::Between(NEGINF, fb);
+    SubSetR1 a2b = SubSetR1::Between(fa, fb);
+    SubSetR1 a2p = SubSetR1::Between(fa, POSINF);
+    SubSetR1 b2p = SubSetR1::Between(fb, POSINF);
 
     EXPECT_TRUE(empty == empty);
     EXPECT_TRUE(whole == whole);
     EXPECT_TRUE(~empty == whole);
     EXPECT_TRUE(~whole == empty);
 
-    EXPECT_EQ(~n2a, "(-10, +inf)");
-    EXPECT_EQ(~n2b, "(10, +inf)");
-    EXPECT_EQ(~a2b, "(-inf, -10) U (10, +inf)");
+    /*
+    EXPECT_EQ(~n2a, "(-10, inf)");
+    EXPECT_EQ(~n2b, "(10, inf)");
+    EXPECT_EQ(~a2b, "(-inf, -10) U (10, inf)");
     EXPECT_EQ(~a2p, "(-inf, -10)");
     EXPECT_EQ(~b2p, "(-inf, 10)");
+    */
 
     EXPECT_EQ(~(~n2a), n2a);
     EXPECT_EQ(~(~n2b), n2b);

@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 // #include "cshape/polynomial.h"
-#include "cshape/parameter.h"
+#include "cshape/scalar.h"
 
 #define EXPECT_TRUE(x) std::cout << (bool(x) ? "    " : "####") << ": Expected true, received " << (bool(x) ? "true" : "false") << std::endl
 #define EXPECT_FALSE(x) std::cout << (bool(x) ? "####" : "    ") << ": Expected false, received " << (bool(x) ? "true" : "false") << std::endl
@@ -12,10 +12,8 @@ int main(){
     
     // Polynomial<int, int> poly(10);
 
-    double value = 10;
-    FiniteSingleValue<double> param(&value);
-
     
+    /*
     std::cout << "----------" << std::endl;
     // EMPTY and WHOLE
     EXPECT_TRUE(EMPTY == EMPTY);
@@ -89,4 +87,5 @@ int main(){
     EXPECT_FALSE(TOPINF <= BOTINF);
     EXPECT_TRUE(TOPINF >= BOTINF);
     EXPECT_TRUE(TOPINF > BOTINF);
+    */
 }

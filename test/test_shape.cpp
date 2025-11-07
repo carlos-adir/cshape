@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
-#include "cshape/bool2d.h"
+#include "cshape/shape.h"
 
 
 
