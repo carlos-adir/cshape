@@ -3,13 +3,36 @@
 
 // #include "cshape/polynomial.h"
 #include "cshape/scalar.h"
+#include "cshape/loggers.h"
 
 #define EXPECT_TRUE(x) std::cout << (bool(x) ? "    " : "####") << ": Expected true, received " << (bool(x) ? "true" : "false") << std::endl
 #define EXPECT_FALSE(x) std::cout << (bool(x) ? "####" : "    ") << ": Expected false, received " << (bool(x) ? "true" : "false") << std::endl
 
 int main(){
     std::cout << "Hello world" << std::endl;
-    
+
+    Logger::getInstance("cshape");
+    Logger::getInstance("cshape.baba");
+    Logger::getInstance("test");
+    Logger::getInstance("abacate.uhu.third");
+
+    std::cout << "1" << std::endl;
+    Logger& a = Logger::getInstance("cshape.baba");
+    std::cout << "2" << std::endl;
+    std::cout << &a << ": " << a.name << std::endl;
+    a.log(LogLevel::DEBUG, "My message");
+    // std::cout << &(a.handler) << std::endl;
+    std::cout << "3" << std::endl;
+    Logger& b = Logger::getInstance("test");
+    std::cout << "4" << std::endl;
+    std::cout << &b << ": " << b.name << std::endl;
+    std::cout << "5" << std::endl;
+
+
+    Logger &c = Logger::getInstance("abacate.uhu.third");
+    c.log(LogLevel::DEBUG, "test up");
+
+    // b.handler->add(a);
     // Polynomial<int, int> poly(10);
 
     

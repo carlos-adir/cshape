@@ -1,5 +1,6 @@
 
 #include "cshape/loggers.h"
+#include <fstream>
 
 const char* levelToString(LogLevel level){
     switch (level)
@@ -33,11 +34,62 @@ std::ostream &operator<<(std::ostream &os, const LogMessage &obj){
     return os;
 }
 
+StreamHandler::StreamHandler(){}
+
+StreamHandler::~StreamHandler(){}
 
 
-Logger::Logger(const std::string& loggerName) : name(loggerName)
+void StreamHandler::write(const LogMessage& message) const
+{
+    std::cout << message << std::endl;
+}
+
+TransmiterHandler::TransmiterHandler(){}
+
+TransmiterHandler::~TransmiterHandler(){}
+
+
+void TransmiterHandler::write(const LogMessage& message) const
+{
+    for (const auto& handler : handlers)
+        handler->write(message);
+}
+
+bool TransmiterHandler::add(const std::shared_ptr<IHandler> ptr)
+{
+    for (const auto& handler : handlers)
+    {
+        std::cout << "---- he" << std::endl;
+        if (ptr == handler)
+        {
+            std::cout << "----     ha" << std::endl;
+            std::cout << "----     Handler is already included" << std::endl;
+        }
+    }
+    this->handlers.push_back(ptr);
+    std::cout << "Got here" << std::endl;
+    return true;
+}
+
+Logger::Logger(const std::string& loggerName) : name(loggerName), handler(std::make_shared<TransmiterHandler>())
 {
     std::cout << "Created instance: '" << loggerName << "'" << std::endl;
+    size_t i = loggerName.size() - 1;
+    for (; i>0; --i)
+        if (loggerName[i] == '.')
+            break;
+    if (i > 0)
+    {
+        std::cout << "Adding handler" << std::endl;
+        const std::string parentName = loggerName.substr(0, i);
+        Logger& parent = getInstance(parentName);
+        handler->add(parent.handler);
+    }
+    else
+    {   
+        std::cout << "Adding cout" << std::endl;
+        handler->add(std::make_shared<StreamHandler>());
+    }
 }
 
 
@@ -57,6 +109,6 @@ Logger& Logger::getInstance(const std::string& loggerName)
 
 void Logger::log(const LogLevel level, const std::string& message) const
 {
-    const LogMessage logMessage = {time(0), level, name, message};
+    handler->write({time(0), level, name, message});
 }
 
