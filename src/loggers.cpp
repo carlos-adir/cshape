@@ -47,7 +47,8 @@ Logger& Logger::getInstance(const std::string& loggerName)
 {
     std::cout << "Getting instance: " << loggerName.size() << ": '" << loggerName << "'" << std::endl;
     if (!loggers.count(loggerName))
-        loggers.insert({loggerName, std::make_shared<Logger>(Logger(loggerName))});
+        loggers.insert({loggerName,
+                        std::shared_ptr<Logger>(new Logger(loggerName))});
     Logger& logger = *loggers.at(loggerName);
     std::cout << "Got instance: " << logger.name << ": '" << &logger << "'" << std::endl;
     return logger;
