@@ -37,21 +37,20 @@ std::ostream &operator<<(std::ostream &os, const LogMessage &obj){
 
 Logger::Logger(const std::string& loggerName) : name(loggerName)
 {
-    std::cout << "Created instance: '" << loggerName << "' at " << this << std::endl;
+    std::cout << "Created instance: '" << loggerName << "'" << std::endl;
 }
 
 
-static std::map<const std::string, Logger> loggers = {};
+static std::map<const std::string, const std::shared_ptr<Logger>> loggers = {};
 
 Logger& Logger::getInstance(const std::string& loggerName)
 {
     std::cout << "Getting instance: " << loggerName.size() << ": '" << loggerName << "'" << std::endl;
     if (!loggers.count(loggerName))
-        loggers.insert({loggerName, Logger(loggerName)});
-
-    Logger& logger = loggers.at(loggerName);
-    std::cout << "Got instance: '" << logger.name << "' at " << &logger << std::endl;
-    return loggers.at(loggerName);
+        loggers.insert({loggerName, std::make_shared<Logger>(Logger(loggerName))});
+    Logger& logger = *loggers.at(loggerName);
+    std::cout << "Got instance: " << logger.name << ": '" << &logger << "'" << std::endl;
+    return logger;
 }
 
 
