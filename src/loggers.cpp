@@ -58,17 +58,21 @@ void TransmiterHandler::write(const LogMessage& message) const
 bool TransmiterHandler::add(const std::shared_ptr<IHandler> ptr)
 {
     for (const auto& handler : handlers)
-    {
-        std::cout << "---- he" << std::endl;
         if (ptr == handler)
-        {
-            std::cout << "----     ha" << std::endl;
-            std::cout << "----     Handler is already included" << std::endl;
-        }
-    }
+            return false;
     this->handlers.push_back(ptr);
-    std::cout << "Got here" << std::endl;
     return true;
+}
+
+bool TransmiterHandler::remove(const std::shared_ptr<IHandler> ptr)
+{
+    for (size_t i = 0; i < handlers.size(); ++i)
+        if (handlers[i] == ptr)
+        {
+            handlers.erase(handlers.begin() + i);
+            return true;
+        }
+    return false;
 }
 
 Logger::Logger(const std::string& loggerName) : name(loggerName), handler(std::make_shared<TransmiterHandler>())

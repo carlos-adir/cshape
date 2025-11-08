@@ -46,6 +46,7 @@ class TransmiterHandler : public IHandler
         ~TransmiterHandler();
         void write(const LogMessage& message) const override;
         bool add(const std::shared_ptr<IHandler> ptr);
+        bool remove(const std::shared_ptr<IHandler> ptr);
 };
 
 class Logger {
