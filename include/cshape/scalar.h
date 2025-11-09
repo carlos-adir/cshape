@@ -10,8 +10,6 @@ static const scalar NEGINF = -std::numeric_limits<scalar>::infinity();
 static const scalar POSINF = std::numeric_limits<scalar>::infinity();
 
 
-scalar string_to_scalar(const std::string &str){
-    return atof(str.c_str());
-}
+scalar string_to_scalar(const std::string &str);
 
 #endif
