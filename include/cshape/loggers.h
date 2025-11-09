@@ -14,12 +14,11 @@ enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
 
 typedef struct LogMessage
 {
-    const time_t curtime;
+    const time_t curtime = time(0);
     const LogLevel level;
     const std::string logger;
     const std::string message;
     operator std::string() const;
-    LogMessage(LogLevel level, const std::string& logger, const std::string& message);
 } LogMessage;
 
 std::ostream &operator<<(std::ostream &os, const LogMessage &obj);

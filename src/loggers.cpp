@@ -33,10 +33,7 @@ std::ostream &operator<<(std::ostream &os, const LogMessage &obj){
     os << obj.message;
     return os;
 }
-LogMessage::LogMessage(LogLevel level, const std::string& logger, const std::string& message) : curtime(time(0)), level(level), logger(logger), message(message)
-{
 
-}
 
 LogMessage::operator std::string() const
 {
@@ -166,13 +163,11 @@ Logger& Logger::getInstance(const std::string& loggerName)
 
 void Logger::log(const LogLevel level, const std::string& message) const
 {
-    LogMessage logmes = {level, name, message};
-    handler->write(logmes);
+    handler->write({level: level, logger: name, message: message});
 }
 
 const Logger& Logger::operator<<(const std::string& message) const
 {
-    LogMessage logmes = {this->level, name, message};
-    handler->write(logmes);
+    handler->write({level: this->level, logger: name, message: message});
     return *this;
 }
