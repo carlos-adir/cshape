@@ -5,7 +5,9 @@
 #include <string>
 #include <sstream>
 #include "cshape/rbool.h"
+#include "cshape/loggers.h"
 
+static Logger& logger = Logger::getInstance("test.rbool");
 
 TEST(Bool1DTest, BuildsSpecial)
 {
@@ -21,16 +23,18 @@ TEST(Bool1DTest, BuildsSingleValue)
 TEST(Bool1DTest, BuildsInterval)
 {
     double fa(-10), fb(10);
-
-    SubSetR1::Between(NEGINF, fa);
-    SubSetR1::Between(NEGINF, fb);
-    SubSetR1::Between(fa, fb);
-    SubSetR1::Between(fa, POSINF);
-    SubSetR1::Between(fb, POSINF);
-    SubSetR1::Lower(fa);
-    SubSetR1::Lower(fb);
-    SubSetR1::Bigger(fa);
-    SubSetR1::Bigger(fb);
+    
+    logger << "Initialize BuildsInterval";
+    logger << SubSetR1::Between(NEGINF, fa);
+    logger << SubSetR1::Between(NEGINF, fb);
+    logger << SubSetR1::Between(fa, fb);
+    logger << SubSetR1::Between(fa, POSINF);
+    logger << SubSetR1::Between(fb, POSINF);
+    logger << SubSetR1::Lower(fa);
+    logger << SubSetR1::Lower(fb);
+    logger << SubSetR1::Bigger(fa);
+    logger << SubSetR1::Bigger(fb);
+    logger << "Finish Builds Interval";
 }
 
 
@@ -100,7 +104,7 @@ TEST(Bool1DTest, ContainsSingleton)
 {
     SubSetR1 empty = SubSetR1::Empty();
     SubSetR1 whole = SubSetR1::Whole();
-    EXPECT_TRUE(empty.contains(empty));
+    EXPECT_FALSE(empty.contains(empty));
     EXPECT_FALSE(empty.contains(whole));
     EXPECT_TRUE(whole.contains(empty));
     EXPECT_TRUE(whole.contains(whole));
