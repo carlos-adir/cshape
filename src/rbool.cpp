@@ -1,7 +1,8 @@
 
 #include "cshape/rbool.h"
+#include "cshape/loggers.h"
 
-
+const static Logger& logger = Logger::getInstance("cshape.rbool");
 
 //
 //
@@ -138,6 +139,8 @@ void compute_middle(const std::vector<scalar> &knots,
 
 SubSetR1 SubSetR1::operator~() const
 {
+    logger << "Begin SubSetR1::operator~";
+    logger << *this;
     switch (typo)
     {
         case SubSetR1Typo::Empty:
@@ -197,7 +200,11 @@ SubSetR1 SubSetR1::operator~() const
 };
 
 
-SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const{
+SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const
+{
+    logger << "Begin SubSetR1::operator|";
+    logger << *this;
+    logger << other;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return *this;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
@@ -241,7 +248,11 @@ SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const{
 };
 
 
-SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const{
+SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const
+{
+    logger << "Begin SubSetR1::operator&";
+    logger << *this;
+    logger << other;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return other;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole

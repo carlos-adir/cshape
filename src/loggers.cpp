@@ -61,7 +61,7 @@ void CoutHandler::write(const LogMessage& message) const
 }
 
 
-FileHandler::FileHandler(const std::string& filename) : filename(filename), stream(*new std::ofstream(filename))
+FileHandler::FileHandler(const std::string& filename) : stream(*new std::ofstream(filename)), filename(filename)
 {
 }
 
@@ -123,7 +123,7 @@ bool TransmiterHandler::remove(const std::shared_ptr<IHandler> ptr)
     return false;
 }
 
-Logger::Logger(const std::string& loggerName) : name(loggerName), handler(std::make_shared<TransmiterHandler>())
+Logger::Logger(const std::string& loggerName) : name(loggerName)
 {
     std::cout << "Created instance: '" << loggerName << "'" << std::endl;
     size_t i = loggerName.size() - 1;
@@ -146,6 +146,21 @@ Logger::Logger(const std::string& loggerName) : name(loggerName), handler(std::m
     }
 }
 
+Logger::~Logger()
+{
+    flush();
+};
+
+void Logger::flush() const
+{
+    if (buffer->str().back() != '\n')
+        return;
+    log(this->level, buffer->str());
+    buffer->str("");
+    buffer->clear();
+}
+
+
 
 static std::map<const std::string, const std::shared_ptr<Logger>> loggers = {};
 
@@ -164,10 +179,4 @@ Logger& Logger::getInstance(const std::string& loggerName)
 void Logger::log(const LogLevel level, const std::string& message) const
 {
     handler->write({level: level, logger: name, message: message});
-}
-
-const Logger& Logger::operator<<(const std::string& message) const
-{
-    handler->write({level: this->level, logger: name, message: message});
-    return *this;
 }

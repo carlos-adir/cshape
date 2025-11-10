@@ -26,6 +26,7 @@ std::ostream &operator<<(std::ostream &os, const LogMessage &obj);
 class IHandler 
 {
     public:
+        bool is_active = true;
         virtual void write(const LogMessage& message) const = 0;
 };
 
@@ -65,14 +66,25 @@ class TransmiterHandler : public IHandler
 class Logger {
 private:
     Logger(const std::string& loggerName);
-    
+    const std::unique_ptr<std::ostringstream> buffer = std::make_unique<std::ostringstream>();
+    void flush() const;
 public:
+    ~Logger();
     LogLevel level = LogLevel::DEBUG;
     const std::string name;
-    const std::shared_ptr<TransmiterHandler> handler;
+    const std::shared_ptr<TransmiterHandler> handler = std::make_shared<TransmiterHandler>();
     static Logger& getInstance(const std::string& filename);
+    
     void log(const LogLevel level, const std::string &message) const;
-    const Logger& operator<<(const std::string& obj) const;
+    template<typename T>
+    const Logger& operator<<(const T& obj) const {
+        if (handler->is_active)
+        {
+            *buffer << obj;
+            flush();
+        }
+        return *this;
+    }
 };
 
 #endif

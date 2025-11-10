@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include "cshape/loggers.h"
 #include "cshape/scalar.h"
 
 
