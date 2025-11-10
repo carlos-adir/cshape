@@ -100,7 +100,8 @@ TransmiterHandler::~TransmiterHandler(){}
 void TransmiterHandler::write(const LogMessage& message) const
 {
     for (const auto& handler : handlers)
-        handler->write(message);
+        if (handler->is_active)
+            handler->write(message);
 }
 
 bool TransmiterHandler::add(const std::shared_ptr<IHandler> ptr)
@@ -184,5 +185,6 @@ Logger& Logger::getInstance(const std::string& loggerName)
 
 void Logger::log(const LogLevel level, const std::string& message) const
 {
-    handler->write({level: level, logger: name, message: message});
+    if (handler->is_active)
+        handler->write({level: level, logger: name, message: message});
 }
