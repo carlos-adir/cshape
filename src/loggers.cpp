@@ -148,14 +148,20 @@ Logger::Logger(const std::string& loggerName) : name(loggerName)
 
 Logger::~Logger()
 {
-    flush();
+    if (buffer->str().size() > 0)
+    {
+        log(this->level, buffer->str());
+        buffer->str("");
+        buffer->clear();
+    }
 };
 
 void Logger::flush() const
 {
-    if (buffer->str().back() != '\n')
+    const std::string str = buffer->str();
+    if (str.back() != '\n')
         return;
-    log(this->level, buffer->str());
+    log(this->level, str.substr(0, str.size()-1));
     buffer->str("");
     buffer->clear();
 }

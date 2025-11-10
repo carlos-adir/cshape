@@ -139,30 +139,44 @@ void compute_middle(const std::vector<scalar> &knots,
 
 SubSetR1 SubSetR1::operator~() const
 {
-    logger << "Begin SubSetR1::operator~";
-    logger << *this;
+    logger << "Begin SubSetR1::operator~" << "\n";
+    logger << *this << "\n";
     switch (typo)
     {
         case SubSetR1Typo::Empty:
+            logger << "Return Whole" << "\n";
             return SubSetR1::Whole();
         case SubSetR1Typo::Whole:
+            logger << "Return Empty" << "\n";
             return SubSetR1::Empty();
         case SubSetR1Typo::Point:
         {
             IntervalR1 left = {NEGINF, this->finites[0], CLOSED_INF, false};
             IntervalR1 right = {this->finites[0], POSINF, false, CLOSED_INF};
-            return SubSetR1({}, {left, right});
+            SubSetR1 inverted = SubSetR1({}, {left, right});
+            logger << "Return " << inverted << "\n";
+            return inverted;
         }
         case SubSetR1Typo::Interval:
         {
             const IntervalR1 interval = this->intervals[0];
             if (interval.start == NEGINF)
-                return SubSetR1::Bigger(interval.end, !interval.closed_right);
+            {
+                SubSetR1 inverted = SubSetR1::Bigger(interval.end, !interval.closed_right);
+                logger << "Return " << inverted << "\n";
+                return inverted;
+            }
             else if (interval.end == POSINF)
-                return SubSetR1::Lower(interval.start, !interval.closed_left);
+            {
+                SubSetR1 inverted = SubSetR1::Lower(interval.start, !interval.closed_left);
+                logger << "Return " << inverted << "\n";
+                return inverted;
+            }
             IntervalR1 left = {NEGINF, this->intervals[0].start, CLOSED_INF, !this->intervals[0].closed_left};
             IntervalR1 right = {this->intervals[0].end, POSINF, !this->intervals[0].closed_right, CLOSED_INF};
-            return SubSetR1({}, {left, right});
+            SubSetR1 inverted = SubSetR1({}, {left, right});
+            logger << "Return " << inverted << "\n";
+            return inverted;
         }
         case SubSetR1Typo::Disjoint:
         {
@@ -192,7 +206,9 @@ SubSetR1 SubSetR1::operator~() const
             std::vector<scalar> finites;
             std::vector<IntervalR1> intervals;
             compute_middle(knots, inside, finites, intervals);
-            return SubSetR1(finites, intervals);
+            SubSetR1 inverted = SubSetR1(finites, intervals);
+            logger << "Return " << inverted << "\n";
+            return inverted;
         }
         default:
             throw std::invalid_argument("Wrong typo");
