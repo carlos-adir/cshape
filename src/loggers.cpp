@@ -159,7 +159,7 @@ Logger::~Logger()
 void Logger::flush() const
 {
     const std::string str = buffer->str();
-    if (str.back() != '\n')
+    if (str.back() != ENDL)
         return;
     log(this->level, str.substr(0, str.size()-1));
     buffer->str("");

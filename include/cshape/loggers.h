@@ -10,6 +10,8 @@
 #include <vector>
 #include <memory>
 
+const static char ENDL = '\n';
+
 enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
 
 typedef struct LogMessage

@@ -58,6 +58,19 @@ SubSetR1::SubSetR1(const std::vector<scalar> &finites,
                    const std::vector<IntervalR1> &intervals):
     finites(finites), intervals(intervals), typo(find_typo(finites, intervals))
     {
+        logger << "Inside SubSetR1 constructor" << ENDL;
+        logger << "Finites = {";
+        for (auto finite : finites)
+        {
+            logger << finite << ", ";
+        }
+        logger << "}" << ENDL;
+        logger << "Intervals = ";
+        for (auto interval : intervals)
+        {
+            logger << interval << " U ";
+        }
+        logger << "}" << ENDL;
         const size_t fsize = finites.size();
         const size_t isize = intervals.size();
         for (size_t i = 0; i + 1 < fsize; ++i)
@@ -139,22 +152,22 @@ void compute_middle(const std::vector<scalar> &knots,
 
 SubSetR1 SubSetR1::operator~() const
 {
-    logger << "Begin SubSetR1::operator~" << "\n";
-    logger << *this << "\n";
+    logger << "Begin SubSetR1::operator~" << ENDL;
+    logger << *this << ENDL;
     switch (typo)
     {
         case SubSetR1Typo::Empty:
-            logger << "Return Whole" << "\n";
+            logger << "Return Whole" << ENDL;
             return SubSetR1::Whole();
         case SubSetR1Typo::Whole:
-            logger << "Return Empty" << "\n";
+            logger << "Return Empty" << ENDL;
             return SubSetR1::Empty();
         case SubSetR1Typo::Point:
         {
             IntervalR1 left = {NEGINF, this->finites[0], CLOSED_INF, false};
             IntervalR1 right = {this->finites[0], POSINF, false, CLOSED_INF};
             SubSetR1 inverted = SubSetR1({}, {left, right});
-            logger << "Return " << inverted << "\n";
+            logger << "Return " << inverted << ENDL;
             return inverted;
         }
         case SubSetR1Typo::Interval:
@@ -163,19 +176,19 @@ SubSetR1 SubSetR1::operator~() const
             if (interval.start == NEGINF)
             {
                 SubSetR1 inverted = SubSetR1::Bigger(interval.end, !interval.closed_right);
-                logger << "Return " << inverted << "\n";
+                logger << "Return " << inverted << ENDL;
                 return inverted;
             }
             else if (interval.end == POSINF)
             {
                 SubSetR1 inverted = SubSetR1::Lower(interval.start, !interval.closed_left);
-                logger << "Return " << inverted << "\n";
+                logger << "Return " << inverted << ENDL;
                 return inverted;
             }
             IntervalR1 left = {NEGINF, this->intervals[0].start, CLOSED_INF, !this->intervals[0].closed_left};
             IntervalR1 right = {this->intervals[0].end, POSINF, !this->intervals[0].closed_right, CLOSED_INF};
             SubSetR1 inverted = SubSetR1({}, {left, right});
-            logger << "Return " << inverted << "\n";
+            logger << "Return " << inverted << ENDL;
             return inverted;
         }
         case SubSetR1Typo::Disjoint:
@@ -207,7 +220,7 @@ SubSetR1 SubSetR1::operator~() const
             std::vector<IntervalR1> intervals;
             compute_middle(knots, inside, finites, intervals);
             SubSetR1 inverted = SubSetR1(finites, intervals);
-            logger << "Return " << inverted << "\n";
+            logger << "Return " << inverted << ENDL;
             return inverted;
         }
         default:
@@ -218,9 +231,8 @@ SubSetR1 SubSetR1::operator~() const
 
 SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const
 {
-    logger << "Begin SubSetR1::operator|";
-    logger << *this;
-    logger << other;
+    logger << "Begin SubSetR1::operator|" << ENDL;
+    logger << *this << " | " << other << ENDL;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return *this;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
@@ -266,9 +278,8 @@ SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const
 
 SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const
 {
-    logger << "Begin SubSetR1::operator&";
-    logger << *this;
-    logger << other;
+    logger << "Begin SubSetR1::operator&" << ENDL;
+    logger << *this << " & " << other << ENDL;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return other;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
@@ -318,6 +329,15 @@ void compute_middle(const std::vector<scalar> &knots,
                     std::vector<scalar> &finites,
                     std::vector<IntervalR1> &intervals)
 {
+    logger << "Inside 'compute_middle'" << ENDL;
+    logger << "Received knots: {" << knots[0];
+    for (size_t i = 1; i < knots.size(); ++i)
+        logger << ", " << knots[i];
+    logger << "}" << ENDL;
+    logger << "Received inside: {" << inside[0];
+    for (size_t i = 1; i < inside.size(); ++i)
+        logger << ", " << inside[i];
+    logger << "}" << ENDL;
     scalar start = NEGINF;
     bool closed = false;
     for(size_t i = 0; i < knots.size(); ++i){
@@ -338,7 +358,7 @@ void compute_middle(const std::vector<scalar> &knots,
             closed = midd;
         }
     }
-    if (start != NEGINF)
+    if (inside.back())
     {
         intervals.push_back({start, POSINF, closed, CLOSED_INF});
     }
