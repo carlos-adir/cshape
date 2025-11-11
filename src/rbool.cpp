@@ -42,7 +42,7 @@ bool SubSetR1::operator==(const SubSetR1 &other) const
 
 
 SubSetR1 string_to_subset(const std::string &str);
-SubSetR1Typo find_typo(const std::vector<scalar> &finites,
+SubSetR1Typo find_typo(const std::vector<Scalar> &finites,
                        const std::vector<IntervalR1> &intervals);
 
 // Clone
@@ -54,7 +54,7 @@ SubSetR1::SubSetR1(const std::string &str):SubSetR1(
     string_to_subset(str).intervals) {} ;
 
 
-SubSetR1::SubSetR1(const std::vector<scalar> &finites,
+SubSetR1::SubSetR1(const std::vector<Scalar> &finites,
                    const std::vector<IntervalR1> &intervals):
     finites(finites), intervals(intervals), typo(find_typo(finites, intervals))
     {
@@ -111,25 +111,25 @@ const SubSetR1 SubSetR1::Whole()
     return SubSetR1({}, {interval});
 }
 
-const SubSetR1 SubSetR1::Point(const scalar &value)
+const SubSetR1 SubSetR1::Point(const Scalar &value)
 {
     return SubSetR1({value}, {});
 }
 
-const SubSetR1 SubSetR1::Lower(const scalar &value, const bool closed){
+const SubSetR1 SubSetR1::Lower(const Scalar &value, const bool closed){
     IntervalR1 interval {NEGINF, value, CLOSED_INF, closed};
     return SubSetR1({}, {interval});
 }
 
 
-const SubSetR1 SubSetR1::Bigger(const scalar &value, const bool closed)
+const SubSetR1 SubSetR1::Bigger(const Scalar &value, const bool closed)
 {
     IntervalR1 interval {value, POSINF, closed, CLOSED_INF};
     return SubSetR1({}, {interval});
 }
 
-const SubSetR1 SubSetR1::Between(const scalar &sta,
-                                 const scalar &end,
+const SubSetR1 SubSetR1::Between(const Scalar &sta,
+                                 const Scalar &end,
                                  const bool closed_left,
                                  const bool closed_right)
 {
@@ -145,9 +145,9 @@ const SubSetR1 SubSetR1::Between(const scalar &sta,
 //
 //
 
-void compute_middle(const std::vector<scalar> &knots,
+void compute_middle(const std::vector<Scalar> &knots,
                     const std::vector<bool> &inside,
-                    std::vector<scalar> &finites,
+                    std::vector<Scalar> &finites,
                     std::vector<IntervalR1> &intervals);
 
 SubSetR1 SubSetR1::operator~() const
@@ -193,8 +193,8 @@ SubSetR1 SubSetR1::operator~() const
         }
         case SubSetR1Typo::Disjoint:
         {
-            std::set<scalar> setknots = {NEGINF, POSINF};
-            for (const scalar point : this->finites)
+            std::set<Scalar> setknots = {NEGINF, POSINF};
+            for (const Scalar point : this->finites)
                 setknots.insert(point);
             for (const IntervalR1 interval : this->intervals)
             {
@@ -204,19 +204,19 @@ SubSetR1 SubSetR1::operator~() const
             setknots.erase(NEGINF);
             setknots.erase(POSINF);
             std::vector<bool> inside(2 * setknots.size() + 1, false);
-            const std::vector<scalar> knots(setknots.begin(), setknots.end());
+            const std::vector<Scalar> knots(setknots.begin(), setknots.end());
 
             inside[0] = !this->contains(knots[0] - 1);
             for (size_t i = 0; i < knots.size(); ++i)
                 inside[2*i + 1] = !this->contains(knots[i]);
             for (size_t i = 1; i < knots.size(); ++i){
-                const scalar middle = (knots[i-1] + knots[i]) / 2;
+                const Scalar middle = (knots[i-1] + knots[i]) / 2;
                 inside[2 * i] = !this->contains(middle);
             }
-            const scalar last = knots[knots.size() - 1] + 1;
+            const Scalar last = knots[knots.size() - 1] + 1;
             inside[2 * knots.size()] = !this->contains(last);
 
-            std::vector<scalar> finites;
+            std::vector<Scalar> finites;
             std::vector<IntervalR1> intervals;
             compute_middle(knots, inside, finites, intervals);
             SubSetR1 inverted = SubSetR1(finites, intervals);
@@ -238,10 +238,10 @@ SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
         return other;
 
-    std::set<scalar> setknots = {NEGINF, POSINF};
-    for (const scalar point : this->finites)
+    std::set<Scalar> setknots = {NEGINF, POSINF};
+    for (const Scalar point : this->finites)
         setknots.insert(point);
-    for (const scalar point : other.finites)
+    for (const Scalar point : other.finites)
         setknots.insert(point);
     for (const IntervalR1 interval : this->intervals)
     {
@@ -256,20 +256,20 @@ SubSetR1 SubSetR1::operator|(const SubSetR1 &other) const
     setknots.erase(NEGINF);
     setknots.erase(POSINF);
     
-    const std::vector<scalar> knots(setknots.begin(), setknots.end());
+    const std::vector<Scalar> knots(setknots.begin(), setknots.end());
     std::vector<bool> inside(2 * knots.size() + 1, false);
 
     inside[0] = this->contains(knots[0] - 1) || other.contains(knots[0] - 1);
     for (size_t i = 0; i < knots.size(); ++i)
         inside[2*i + 1] = this->contains(knots[i]) || other.contains(knots[i]);
     for (size_t i = 1; i < knots.size(); ++i){
-        const scalar midknot = (knots[i - 1] + knots[i]) / 2;
+        const Scalar midknot = (knots[i - 1] + knots[i]) / 2;
         inside[2 * i] = this->contains(midknot) || other.contains(midknot);
     }
-    const scalar last = knots[knots.size() - 1] + 1;
+    const Scalar last = knots[knots.size() - 1] + 1;
     inside[2 * knots.size()] = this->contains(last) || other.contains(last);
     
-    std::vector<scalar> finites;
+    std::vector<Scalar> finites;
     std::vector<IntervalR1> intervals;
     compute_middle(knots, inside, finites, intervals);
     return SubSetR1(finites, intervals);
@@ -285,10 +285,10 @@ SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
         return *this;
 
-    std::set<scalar> setknots = {NEGINF, POSINF};
-    for (const scalar point : this->finites)
+    std::set<Scalar> setknots = {NEGINF, POSINF};
+    for (const Scalar point : this->finites)
         setknots.insert(point);
-    for (const scalar point : other.finites)
+    for (const Scalar point : other.finites)
         setknots.insert(point);
     for (const IntervalR1 interval : this->intervals)
     {
@@ -303,20 +303,20 @@ SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const
     setknots.erase(NEGINF);
     setknots.erase(POSINF);
 
-    const std::vector<scalar> knots(setknots.begin(), setknots.end());
+    const std::vector<Scalar> knots(setknots.begin(), setknots.end());
     std::vector<bool> inside(2 * knots.size() + 1, false);
 
     inside[0] = this->contains(knots[0] - 1) && other.contains(knots[0] - 1);
     for (size_t i = 0; i < knots.size(); ++i)
         inside[2*i + 1] = this->contains(knots[i]) && other.contains(knots[i]);
     for (size_t i = 1; i < knots.size(); ++i){
-        const scalar midknot = (knots[i-1] + knots[i]) / 2;
+        const Scalar midknot = (knots[i-1] + knots[i]) / 2;
         inside[2*i] = this->contains(midknot) && other.contains(midknot);
     }
-    const scalar last = knots[knots.size() - 1] + 1;
+    const Scalar last = knots[knots.size() - 1] + 1;
     inside[2 * knots.size()] = this->contains(last) && other.contains(last);
 
-    std::vector<scalar> finites;
+    std::vector<Scalar> finites;
     std::vector<IntervalR1> intervals;
     compute_middle(knots, inside, finites, intervals);
     return SubSetR1(finites, intervals);
@@ -324,9 +324,9 @@ SubSetR1 SubSetR1::operator&(const SubSetR1 &other) const
 
 
 
-void compute_middle(const std::vector<scalar> &knots,
+void compute_middle(const std::vector<Scalar> &knots,
                     const std::vector<bool> &inside,
-                    std::vector<scalar> &finites,
+                    std::vector<Scalar> &finites,
                     std::vector<IntervalR1> &intervals)
 {
     logger << "Inside 'compute_middle'" << ENDL;
@@ -338,10 +338,10 @@ void compute_middle(const std::vector<scalar> &knots,
     for (size_t i = 1; i < inside.size(); ++i)
         logger << ", " << inside[i];
     logger << "}" << ENDL;
-    scalar start = NEGINF;
+    Scalar start = NEGINF;
     bool closed = false;
     for(size_t i = 0; i < knots.size(); ++i){
-        const scalar &knot = knots[i];
+        const Scalar &knot = knots[i];
         const bool left = inside[2*i];
         const bool midd = inside[2*i+1];
         const bool righ = inside[2*i+2];
@@ -409,7 +409,7 @@ std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj){
     const size_t isize = obj.intervals.size();
 
     std::vector<std::string> msgs;
-    std::vector<scalar> finis;
+    std::vector<Scalar> finis;
     bool first = true;
     bool flag = false;
     size_t i = 0, f = 0;
@@ -476,7 +476,7 @@ std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj){
 //
 
 
-bool IntervalR1::contains(const scalar &other) const
+bool IntervalR1::contains(const Scalar &other) const
 {
     return (this->start < other || (this->closed_left && this->start == other))
         && (other < this->end || (this->closed_right && this->end == other));
@@ -496,11 +496,11 @@ bool IntervalR1::contains(const IntervalR1 &other) const
     return true;    
 }
 
-bool SubSetR1::contains(const scalar &other) const{
+bool SubSetR1::contains(const Scalar &other) const{
     for(const IntervalR1 interval : this->intervals)
         if(interval.contains(other))
             return true;
-    for(const scalar point : this->finites)
+    for(const Scalar point : this->finites)
         if(point == other)
             return true;
     return false;
@@ -539,7 +539,7 @@ bool SubSetR1::contains(const SubSetR1 &other) const{
         case SubSetR1Typo::Interval:
             return this->contains(other.intervals[0]);
         case SubSetR1Typo::Disjoint:
-            for (const scalar point : other.finites)
+            for (const Scalar point : other.finites)
                 if (!this->contains(point))
                     return false;
             for (const IntervalR1 interval : other.intervals)
@@ -571,8 +571,8 @@ IntervalR1 string_to_interval(const std::string &str) {
         ++virg;
     if (virg == size)
         throw std::invalid_argument("Invalid string to convert to interval");
-    const scalar first = string_to_scalar(str.substr(1, virg - 1));
-    const scalar second = string_to_scalar(str.substr(virg + 1, size - virg - 2));
+    const Scalar first = string_to_scalar(str.substr(1, virg - 1));
+    const Scalar second = string_to_scalar(str.substr(virg + 1, size - virg - 2));
     if (first == NEGINF)
         closed_left = true;
     if (second == POSINF)
@@ -583,7 +583,7 @@ IntervalR1 string_to_interval(const std::string &str) {
 
 
 
-SubSetR1Typo find_typo(const std::vector<scalar> &finites,
+SubSetR1Typo find_typo(const std::vector<Scalar> &finites,
                        const std::vector<IntervalR1> &intervals)
 {
     const size_t fsize = finites.size();
@@ -619,7 +619,7 @@ SubSetR1 string_to_subset(const std::string &str)
     if (str == WHOLESTR)
         return SubSetR1::Whole();
     const size_t size = str.size();
-    std::vector<scalar> finites;
+    std::vector<Scalar> finites;
     std::vector<IntervalR1> intervals;
     for (size_t sta = 0; sta < size; ++sta){
         if (str[sta] != '(' && str[sta] != '[' && str[sta] != '{')
@@ -634,7 +634,7 @@ SubSetR1 string_to_subset(const std::string &str)
                 size_t j = i + 1;
                 while (j < subsize && sub[j] != ',' && sub[j] != '}')
                     ++j;
-                const scalar new_value = string_to_scalar(sub.substr(i, j - i));
+                const Scalar new_value = string_to_scalar(sub.substr(i, j - i));
                 finites.push_back(new_value);
                 i = j + 1;
             }

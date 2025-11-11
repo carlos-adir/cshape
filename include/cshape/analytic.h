@@ -101,8 +101,8 @@ Polynomial<I, O> operator* (const O& scalar, const Polynomial<I, O> &poly)
 
 
 template class Polynomial<int, int>;
-template class Polynomial<int, scalar>;
-template class Polynomial<scalar, int>;
-template class Polynomial<scalar, scalar>;
+template class Polynomial<int, Scalar>;
+template class Polynomial<Scalar, int>;
+template class Polynomial<Scalar, Scalar>;
 
 #endif
