@@ -16,8 +16,6 @@ typedef unsigned int uint4;
 typedef unsigned short uint2;
 typedef unsigned short uint1;
 
-class SubSetR1;
-
 enum class SubSetR1Typo
 {
     Empty = 0,
@@ -27,58 +25,68 @@ enum class SubSetR1Typo
     Disjoint
 };
 
-typedef struct IntervalR1
+template<typename T>
+struct IntervalR1
 {
-    const Scalar start;
-    const Scalar end;
+    const T start;
+    const T end;
     const bool closed_left;
     const bool closed_right;
-    bool operator==(const IntervalR1 &other) const;
-    bool operator!=(const IntervalR1 &other) const {return !this->operator==(other);};
-    bool contains(const Scalar &other) const;
-    bool contains(const IntervalR1 &other) const;
-} IntervalR1;
+    bool operator==(const IntervalR1<T> &other) const;
+    bool operator!=(const IntervalR1<T> &other) const {return !this->operator==(other);};
+    bool contains(const T &other) const;
+    bool contains(const IntervalR1<T> &other) const;
+};
 
+template<typename T>
 class SubSetR1{
 private:
-    const std::vector<Scalar> finites;
-    const std::vector<IntervalR1> intervals;
+    const std::vector<T> finites;
+    const std::vector<IntervalR1<T>> intervals;
     
-    SubSetR1(const std::vector<Scalar> &finites,
-             const std::vector<IntervalR1> &intervals,
+    SubSetR1(const std::vector<T> &finites,
+             const std::vector<IntervalR1<T>> &intervals,
              const SubSetR1Typo typo);
 
 public:
+    static constexpr T NEGINF = -std::numeric_limits<T>::infinity();
+    static constexpr T POSINF = std::numeric_limits<T>::infinity();
+
     SubSetR1(const SubSetR1 &other); // Copy constructor
     SubSetR1(const std::string &str);
-    SubSetR1(const std::vector<Scalar> &finites,
-             const std::vector<IntervalR1> &intervals);
+    SubSetR1(const std::vector<T> &finites,
+             const std::vector<IntervalR1<T>> &intervals);
 
-    bool contains(const Scalar &other) const;
-    bool contains(const IntervalR1 &other) const;
-    bool contains(const SubSetR1 &other) const;
+    bool contains(const T &other) const;
+    bool contains(const IntervalR1<T> &other) const;
+    bool contains(const SubSetR1<T> &other) const;
 
-    static const SubSetR1 Empty();
-    static const SubSetR1 Whole();
-    static const SubSetR1 Point(const Scalar &value);
-    static const SubSetR1 Lower(const Scalar &value, const bool closed = true);
-    static const SubSetR1 Bigger(const Scalar &value, const bool closed = true);
-    static const SubSetR1 Between(const Scalar &sta,
-                                  const Scalar &end,
-                                  const bool closed_left = true,
-                                  const bool closed_right = true);
+    static const SubSetR1<T> Empty();
+    static const SubSetR1<T> Whole();
+    static const SubSetR1<T> Point(const T &value);
+    static const SubSetR1<T> Lower(const T &value, const bool closed = true);
+    static const SubSetR1<T> Bigger(const T &value, const bool closed = true);
+    static const SubSetR1<T> Between(const T &sta,
+                                     const T &end,
+                                     const bool closed_left = true,
+                                     const bool closed_right = true);
 
-    SubSetR1 operator~() const;
-    SubSetR1 operator|(const SubSetR1 &other) const;
-    SubSetR1 operator&(const SubSetR1 &other) const;
+    SubSetR1<T> operator~() const;
+    SubSetR1<T> operator|(const SubSetR1<T> &other) const;
+    SubSetR1<T> operator&(const SubSetR1<T> &other) const;
 
-    bool operator==(const SubSetR1 &other) const;
-    bool operator!=(const SubSetR1 &other) const {return !this->operator==(other);};
+    bool operator==(const SubSetR1<T> &other) const;
+    bool operator!=(const SubSetR1<T> &other) const {return !this->operator==(other);};
 
     const SubSetR1Typo typo;
 
     operator std::string() const;
-    friend std::ostream &operator<<(std::ostream &os, const SubSetR1 &obj);
+    template<typename U>
+    friend std::ostream &operator<<(std::ostream &os, const SubSetR1<U> &obj);
 };
+
+
+template class SubSetR1<int>;
+template class SubSetR1<Scalar>;
 
 #endif

@@ -11,13 +11,13 @@ static Logger& logger = Logger::getInstance("test.rbool");
 
 TEST(Bool1DTest, BuildsSpecial)
 {
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
 }
 
 TEST(Bool1DTest, BuildsSingleValue)
 {
-    SubSetR1 point = SubSetR1::Point(10);
+    SubSetR1<Scalar> point = SubSetR1<Scalar>::Point(10);
 }
 
 TEST(Bool1DTest, BuildsInterval)
@@ -25,47 +25,47 @@ TEST(Bool1DTest, BuildsInterval)
     double fa(-10), fb(10);
     
     logger << "Initialize BuildsInterval";
-    logger << SubSetR1::Between(NEGINF, fa);
-    logger << SubSetR1::Between(NEGINF, fb);
-    logger << SubSetR1::Between(fa, fb);
-    logger << SubSetR1::Between(fa, POSINF);
-    logger << SubSetR1::Between(fb, POSINF);
-    logger << SubSetR1::Lower(fa);
-    logger << SubSetR1::Lower(fb);
-    logger << SubSetR1::Bigger(fa);
-    logger << SubSetR1::Bigger(fb);
+    logger << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fa);
+    logger << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fb);
+    logger << SubSetR1<Scalar>::Between(fa, fb);
+    logger << SubSetR1<Scalar>::Between(fa, SubSetR1<Scalar>::POSINF);
+    logger << SubSetR1<Scalar>::Between(fb, SubSetR1<Scalar>::POSINF);
+    logger << SubSetR1<Scalar>::Lower(fa);
+    logger << SubSetR1<Scalar>::Lower(fb);
+    logger << SubSetR1<Scalar>::Bigger(fa);
+    logger << SubSetR1<Scalar>::Bigger(fb);
     logger << "Finish Builds Interval";
 }
 
 
 TEST(Bool1DTest, Printing)
 {
-    EXPECT_EQ(std::string(SubSetR1::Empty()), "{}");
-    EXPECT_EQ(std::string(SubSetR1::Whole()), "(-inf, inf)");
-    EXPECT_EQ(std::string(SubSetR1::Point(-10)), "{-10}");
-    EXPECT_EQ(std::string(SubSetR1::Point(10)), "{10}");
-    EXPECT_EQ(std::string(SubSetR1::Between(-10, 10)), "[-10, 10]");
-    EXPECT_EQ(std::string(SubSetR1::Between(NEGINF, 10)), "(-inf, 10]");
-    EXPECT_EQ(std::string(SubSetR1::Lower(10)), "(-inf, 10]");
-    EXPECT_EQ(std::string(SubSetR1::Between(-10, POSINF)), "[-10, inf)");
-    EXPECT_EQ(std::string(SubSetR1::Bigger(10)), "[10, inf)");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Empty()), "{}");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Whole()), "(-inf, inf)");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Point(-10)), "{-10}");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Point(10)), "{10}");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Between(-10, 10)), "[-10, 10]");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, 10)), "(-inf, 10]");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Lower(10)), "(-inf, 10]");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Between(-10, SubSetR1<Scalar>::POSINF)), "[-10, inf)");
+    EXPECT_EQ(std::string(SubSetR1<Scalar>::Bigger(10)), "[10, inf)");
 }
 
 
 TEST(Bool1DTest, BuildsFromString)
 {
-    SubSetR1 obj1("{}");
-    SubSetR1 obj2("(-inf, inf)");
-    SubSetR1 obj3("{10}");
-    SubSetR1 obj4("{-10}");
-    SubSetR1 obj5("[-10, 10]");
+    SubSetR1<Scalar> obj1("{}");
+    SubSetR1<Scalar> obj2("(-inf, inf)");
+    SubSetR1<Scalar> obj3("{10}");
+    SubSetR1<Scalar> obj4("{-10}");
+    SubSetR1<Scalar> obj5("[-10, 10]");
 }
 
 
 TEST(Bool1DTest, CompareSingleton)
 {
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
     // empty and whole
     EXPECT_TRUE(empty == empty);
     EXPECT_FALSE(empty == whole);
@@ -83,9 +83,9 @@ TEST(Bool1DTest, CompareSingleton)
 
 TEST(Bool1DTest, CompareSingleEmptyWhole)
 {
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
-    SubSetR1 finite = SubSetR1::Point(0);
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
+    SubSetR1<Scalar> finite = SubSetR1<Scalar>::Point(0);
 
     EXPECT_FALSE(empty == finite);
     EXPECT_TRUE(empty != finite);
@@ -102,8 +102,8 @@ TEST(Bool1DTest, CompareSingleEmptyWhole)
 
 TEST(Bool1DTest, ContainsSingleton)
 {
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
     EXPECT_FALSE(empty.contains(empty));
     EXPECT_FALSE(empty.contains(whole));
     EXPECT_TRUE(whole.contains(empty));
@@ -113,9 +113,9 @@ TEST(Bool1DTest, ContainsSingleton)
 
 TEST(Bool1DTest, ContainsFinite)
 {
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
-    SubSetR1 finite = SubSetR1::Point(10);
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
+    SubSetR1<Scalar> finite = SubSetR1<Scalar>::Point(10);
 
     EXPECT_TRUE(finite.contains(finite));
 
@@ -132,13 +132,13 @@ TEST(Bool1DTest, ContainsFinite)
 TEST(Bool1DTest, ContainsInterval)
 {
     double fa(-10), fb(10);
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
-    SubSetR1 n2a = SubSetR1::Between(NEGINF, fa);
-    SubSetR1 n2b = SubSetR1::Between(NEGINF, fb);
-    SubSetR1 a2b = SubSetR1::Between(fa, fb);
-    SubSetR1 a2p = SubSetR1::Between(fa, POSINF);
-    SubSetR1 b2p = SubSetR1::Between(fb, POSINF);
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
+    SubSetR1<Scalar> n2a = SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fa);
+    SubSetR1<Scalar> n2b = SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fb);
+    SubSetR1<Scalar> a2b = SubSetR1<Scalar>::Between(fa, fb);
+    SubSetR1<Scalar> a2p = SubSetR1<Scalar>::Between(fa, SubSetR1<Scalar>::POSINF);
+    SubSetR1<Scalar> b2p = SubSetR1<Scalar>::Between(fb, SubSetR1<Scalar>::POSINF);
 
     // Contains empty
     EXPECT_TRUE(n2a.contains(empty));
@@ -211,19 +211,19 @@ TEST(Bool1DTest, ContainsInterval)
 TEST(Bool1DTest, InvertInterval)
 {
     double fa(-10), fb(10);
-    SubSetR1 empty = SubSetR1::Empty();
-    SubSetR1 whole = SubSetR1::Whole();
+    SubSetR1<Scalar> empty = SubSetR1<Scalar>::Empty();
+    SubSetR1<Scalar> whole = SubSetR1<Scalar>::Whole();
     EXPECT_TRUE(empty == empty);
     EXPECT_TRUE(whole == whole);
     EXPECT_TRUE(~empty == whole);
     EXPECT_TRUE(~whole == empty);
 
 
-    SubSetR1 n2a = SubSetR1::Between(NEGINF, fa);
-    SubSetR1 n2b = SubSetR1::Between(NEGINF, fb);
-    SubSetR1 a2b = SubSetR1::Between(fa, fb);
-    SubSetR1 a2p = SubSetR1::Between(fa, POSINF);
-    SubSetR1 b2p = SubSetR1::Between(fb, POSINF);
+    SubSetR1<Scalar> n2a = SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fa);
+    SubSetR1<Scalar> n2b = SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fb);
+    SubSetR1<Scalar> a2b = SubSetR1<Scalar>::Between(fa, fb);
+    SubSetR1<Scalar> a2p = SubSetR1<Scalar>::Between(fa, SubSetR1<Scalar>::POSINF);
+    SubSetR1<Scalar> b2p = SubSetR1<Scalar>::Between(fb, SubSetR1<Scalar>::POSINF);
 
     EXPECT_TRUE(empty == empty);
     EXPECT_TRUE(whole == whole);

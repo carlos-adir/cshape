@@ -16,7 +16,7 @@ template <typename I, typename O>
 class IAnalytic {
     public:
         IAnalytic() {};
-        const SubSetR1 domain = SubSetR1::Whole();
+        const SubSetR1<I> domain = SubSetR1<I>::Whole();
         IAnalytic(const IAnalytic<I, O>& other);  // copy
         virtual O operator()(const I& node) const final { return eval(node);};
         virtual O eval(const I node, const uint1 deriv = 0) const = 0;
