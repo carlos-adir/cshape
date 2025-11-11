@@ -2,7 +2,7 @@ project(CShape)
 
 # add_library(cshape SHARED analytic.cpp polynomial.cpp)
 # add_library(cshape SHARED scalar.cpp bool1d.cpp bool2d.cpp)
-add_library(cshape SHARED scalar.cpp loggers.cpp rbool.cpp)
+add_library(cshape SHARED scalar.cpp loggers.cpp rbool.cpp analytic.cpp)
 
 target_include_directories(cshape
     PUBLIC
