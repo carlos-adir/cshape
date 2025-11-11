@@ -34,6 +34,34 @@ Angle Angle::radians(const Scalar& value)
     const Scalar temp = fmod(value, TAU);
     return Angle::turns(((temp <= TAU / 2) ? temp : (temp - TAU)) / TAU);
 }
+Angle Angle::arg(const Scalar& x, const Scalar& y)
+{
+    if (y == 0)
+        return Angle(x >= 0 ? DIRECTION::XP : DIRECTION::XN, Scalar(0));
+    if (x == 0)
+        return Angle(y >= 0 ? DIRECTION::YP : DIRECTION::YN, Scalar(0));
+    if (x < 0)
+        return Angle::turns(0.5) + Angle::arg(-x, -y);
+    return Angle::radians(atan2f64(y, x));
+}
+
+Angle Angle::operator+(const Angle& other) const
+{
+    Scalar sum = this->amount + other.amount;
+    unsigned char dir = (((unsigned char)this->direction) + ((unsigned char)other.direction));
+    if (sum < -0.125)
+    {
+        sum += 0.25;
+        dir = (dir - 1) % 4;
+    }
+    else if (0.125 < sum)
+    {
+        sum -= 0.25;
+        dir += 1;
+    }
+    return Angle(static_cast<DIRECTION>(dir % 4), sum);
+}
+
 Scalar Angle::cos() const
 {
     switch (direction)

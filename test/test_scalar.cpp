@@ -312,3 +312,41 @@ TEST(AngleTest, SinCos)
     EXPECT_NEAR(Angle::degrees(360).sin(), 0, 1e-15);
 }
 
+
+
+TEST(AngleTest, SumAngles)
+{
+    const Angle deg00 = Angle::degrees(00);
+    const Angle deg05 = Angle::degrees(05);
+    const Angle deg10 = Angle::degrees(10);
+    const Angle deg15 = Angle::degrees(15);
+    const Angle deg30 = Angle::degrees(30);
+    const Angle deg45 = Angle::degrees(45);
+    const Angle deg60 = Angle::degrees(60);
+    const Angle deg90 = Angle::degrees(60);
+
+    EXPECT_EQ(deg00 + deg00, deg00);
+    EXPECT_EQ(deg00 + deg05, deg05);
+    EXPECT_EQ(deg05 + deg00, deg05);
+    EXPECT_EQ(deg05 + deg05, deg10);
+    EXPECT_EQ(deg00 + deg10, deg10);
+    EXPECT_EQ(deg10 + deg00, deg10);
+    EXPECT_EQ(deg05 + deg10, deg15);
+    EXPECT_EQ(deg10 + deg05, deg15);
+
+    EXPECT_EQ(deg15 + deg15, deg30);
+    EXPECT_EQ(deg30 + deg15, deg45);
+    EXPECT_EQ(deg15 + deg30, deg45);
+    EXPECT_EQ(deg30 + deg30, deg60);
+    EXPECT_EQ(deg30 + deg60, deg90);
+    EXPECT_EQ(deg45 + deg45, deg90);
+    EXPECT_EQ(deg60 + deg30, deg90);
+}
+
+
+TEST(AngleTest, Arg)
+{
+    EXPECT_EQ(Angle::arg(0, 0), Angle::degrees(0));
+}
+
+

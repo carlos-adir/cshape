@@ -12,7 +12,7 @@ static const Scalar POSINF = std::numeric_limits<Scalar>::infinity();
 
 const static Scalar TAU = 2 * M_PIf64;
 
-enum class DIRECTION { XP, YP, XN, YN};
+enum class DIRECTION { XP=0, YP=1, XN=2, YN=3};
 
 class Angle
 {
@@ -25,6 +25,7 @@ class Angle
         static Angle degrees(const Scalar& value);
         static Angle degrees(const int value);
         static Angle radians(const Scalar& value);
+        static Angle arg(const Scalar& x, const Scalar&y);
         Scalar cos() const;
         Scalar sin() const;
         Scalar turns() const;
@@ -34,11 +35,12 @@ class Angle
         bool operator==(const Angle& other) const {return this->direction == other.direction && this->amount == other.amount;};
         bool operator!=(const Angle& other) const {return !this->operator==(other);};
 
+        Angle operator+(const Angle& other) const;
+
         operator std::string() const;
         friend std::ostream &operator<<(std::ostream &os, const Angle &obj);
 };
 
 
 Scalar string_to_scalar(const std::string &str);
-
 #endif
