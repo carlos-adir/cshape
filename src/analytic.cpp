@@ -53,6 +53,11 @@ Polynomial<I, O>::Polynomial (const std::initializer_list<O> &coefs) : degree(fi
 template <typename I, typename O>
 Polynomial<I, O>::Polynomial (const Polynomial &other) : degree(other.degree), coefficients(other.coefficients) {};
 
+template <typename I, typename O>
+std::unique_ptr<IAnalytic<I, O>> Polynomial<I, O>::clone () const
+{
+    return std::unique_ptr<IAnalytic<I, O>>(new Polynomial<I, O>(*this));
+}
 
 //
 //
@@ -61,7 +66,6 @@ Polynomial<I, O>::Polynomial (const Polynomial &other) : degree(other.degree), c
 //
 //
 //
-
 
 template <typename I, typename O>
 bool Polynomial<I, O>::operator== (const O& other) const
@@ -227,8 +231,7 @@ Polynomial<I, O>::operator% (const Polynomial<I, O> &other) const
 //
 
 template <typename I, typename O>
-O
-Polynomial<I, O>::eval (const I node, const uint1 deriv) const
+O Polynomial<I, O>::eval(const I node, const uint1 deriv) const
 {
     if (deriv > degree)
         return 0;

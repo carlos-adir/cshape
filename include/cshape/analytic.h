@@ -17,11 +17,9 @@ class IAnalytic {
     public:
         IAnalytic() {};
         const SubSetR1<I> domain = SubSetR1<I>::Whole();
-        IAnalytic(const IAnalytic<I, O>& other);  // copy
+        virtual std::unique_ptr<IAnalytic<I, O>> clone() const = 0;
         virtual O operator()(const I& node) const final { return eval(node);};
         virtual O eval(const I node, const uint1 deriv = 0) const = 0;
-        // virtual bool operator!=(const O& other) const final {return !(this->operator==(other));};
-        // virtual bool operator!=(const IAnalytic<I, O> &other) const final {return !(this->operator==(other));};
 };
 
 template <typename I, typename O>
@@ -43,6 +41,7 @@ class Polynomial : public BaseAnalytic<I, O>
         Polynomial(const std::vector<O> &coefs);
         Polynomial(const std::initializer_list<O> &coefs);
         Polynomial(const Polynomial<I, O> &other);
+        virtual std::unique_ptr<IAnalytic<I, O>> clone() const override;
 
         virtual bool operator==(const O& other) const final;
         virtual bool operator!=(const O& other) const final {return !(this->operator==(other));};
