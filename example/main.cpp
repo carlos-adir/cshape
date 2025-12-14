@@ -2,8 +2,9 @@
 #include <unistd.h>
 
 // #include "cshape/polynomial.h"
-#include "cshape/scalar.h"
-#include "cshape/loggers.h"
+// #include "cshape/scalar.h"
+// #include "cshape/loggers.h"
+#include "cshape/boolalg.h"
 
 #define EXPECT_TRUE(x) std::cout << (bool(x) ? "    " : "####") << ": Expected true, received " << (bool(x) ? "true" : "false") << std::endl
 #define EXPECT_FALSE(x) std::cout << (bool(x) ? "####" : "    ") << ": Expected false, received " << (bool(x) ? "true" : "false") << std::endl
@@ -11,6 +12,7 @@
 int main(){
     std::cout << "Hello world" << std::endl;
 
+    /*
     Logger::getInstance("cshape");
     Logger::getInstance("cshape.baba");
     Logger::getInstance("test");
@@ -31,7 +33,11 @@ int main(){
 
     Logger &c = Logger::getInstance("abacate.uhu.third");
     c.log(LogLevel::DEBUG, "test up");
-
+    */
+    auto a = StringBoolTree::factory->Build(Operations::False, {});
+    std::cout << "asd" << std::endl;
+    auto c = ~a;
+    std::cout << "fee" << std::endl;
     // b.handler->add(a);
     // Polynomial<int, int> poly(10);
 
