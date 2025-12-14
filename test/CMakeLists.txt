@@ -19,6 +19,15 @@ target_link_libraries(
   GTest::gtest_main
 )
 add_executable(
+  test_boolalg
+  test_boolalg.cpp
+)
+target_link_libraries(
+  test_boolalg
+  cshape
+  GTest::gtest_main
+)
+add_executable(
   test_rbool
   test_rbool.cpp
 )
