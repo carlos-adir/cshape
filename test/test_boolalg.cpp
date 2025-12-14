@@ -16,7 +16,7 @@ TEST(BoolalgTest, Constructor)
 }
 
 
-TEST(BoolalgTest, CompareTrueFalse)
+TEST(BoolalgTest, TrueFalseCompare)
 {
     auto f0 = StringBoolTree::factory->False();
     auto f1 = StringBoolTree::factory->False();
@@ -28,7 +28,7 @@ TEST(BoolalgTest, CompareTrueFalse)
     EXPECT_FALSE(t0 == f0);
 }
 
-TEST(BoolalgTest, Inverse)
+TEST(BoolalgTest, TrueFalseInverse)
 {
     auto f = StringBoolTree::factory->False();
     auto t = StringBoolTree::factory->True();
@@ -36,7 +36,7 @@ TEST(BoolalgTest, Inverse)
     EXPECT_TRUE((~t) == f);
 }
 
-TEST(BoolalgTest, Union)
+TEST(BoolalgTest, TrueFalseUnion)
 {
     auto f = StringBoolTree::factory->False();
     auto t = StringBoolTree::factory->True();
@@ -46,7 +46,7 @@ TEST(BoolalgTest, Union)
     EXPECT_TRUE((t | t) == t);
 }
 
-TEST(BoolalgTest, Intersect)
+TEST(BoolalgTest, TrueFalseIntersect)
 {
     auto f = StringBoolTree::factory->False();
     auto t = StringBoolTree::factory->True();
@@ -56,7 +56,7 @@ TEST(BoolalgTest, Intersect)
     EXPECT_TRUE((t & t) == t);
 }
 
-TEST(BoolalgTest, Xor)
+TEST(BoolalgTest, TrueFalseXor)
 {
     auto f = StringBoolTree::factory->False();
     auto t = StringBoolTree::factory->True();
@@ -65,3 +65,27 @@ TEST(BoolalgTest, Xor)
     EXPECT_TRUE((t ^ f) == t);
     EXPECT_TRUE((t ^ t) == f);
 }
+
+
+
+TEST(BoolalgTest, SingleVariable)
+{
+    auto f = StringBoolTree::factory->False();
+    auto t = StringBoolTree::factory->True();
+    auto a = StringBoolVariable::build("a");
+
+    EXPECT_TRUE(a != f);
+    EXPECT_TRUE(f != a);
+    EXPECT_TRUE(a != t);
+    EXPECT_TRUE(t != a);
+    EXPECT_TRUE(a == a);
+
+    EXPECT_TRUE((~a) != a);
+    EXPECT_TRUE((~(~a)) == a);
+    
+    // EXPECT_TRUE((a | a) == a);
+    // EXPECT_TRUE((a & a) == a);
+    // EXPECT_TRUE((a ^ a) == f);
+
+}
+
