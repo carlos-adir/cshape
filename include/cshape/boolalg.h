@@ -24,41 +24,56 @@ class ISimplifier {
         virtual T simplify(const T &obj) const = 0;
 };
 
+template <typename T>
+class Factory
+{
+public:
+    virtual std::shared_ptr<T> Build(const Operations operation, const std::vector<std::shared_ptr<T>> nodes) const = 0;
+};
+
 
 template <typename T>
 class BoolTree : private std::enable_shared_from_this<BoolTree<T>> {
-    protected:
-        BoolTree(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &nodes);
-        virtual std::shared_ptr<BoolTree<T>> build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &nodes);
     public:
+        BoolTree(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> nodes) : operation(operation), nodes(nodes) {};
         const Operations operation;
         const std::vector<std::shared_ptr<BoolTree<T>>> nodes;
         
-        BoolTree();
-
-        static std::vector<ISimplifier<std::shared_ptr<BoolTree<T>>>> simplifiers;
-
         std::shared_ptr<BoolTree<T>> operator~();
         std::shared_ptr<BoolTree<T>> operator|(const std::shared_ptr<BoolTree<T>> &other);
         std::shared_ptr<BoolTree<T>> operator&(const std::shared_ptr<BoolTree<T>> &other);
         std::shared_ptr<BoolTree<T>> operator^(const std::shared_ptr<BoolTree<T>> &other);
 
-        virtual std::string FalseStr() = 0;
-        virtual std::string TrueStr() = 0; 
+        static const std::unique_ptr<Factory<BoolTree<T>>> factory;
+        static std::vector<ISimplifier<std::shared_ptr<BoolTree<T>>>> simplifiers;
+
 };
 
-
-template <typename T>
-BoolTree<T>::BoolTree () : operation(Operations::False), nodes ({}){};
-
-template <typename T>
-BoolTree<T>::BoolTree (const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &nodes) : operation(operation), nodes (nodes){};
-
-template <typename T>
-std::shared_ptr<BoolTree<T>> BoolTree<T>::build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &nodes)
+class StringBoolTree : public BoolTree<char>
 {
-    return BoolTree<T>(operation, nodes).shared_from_this();
+    public:
+        StringBoolTree(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) : BoolTree<char>(operation, nodes) {};
 };
+
+
+class StringBoolTreeFactory : public Factory<BoolTree<char>>
+{
+    public:
+        StringBoolTreeFactory() {};
+        std::shared_ptr<BoolTree<char>> Build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) const override;
+    
+};
+
+template class BoolTree<char>;
+
+template<>
+const std::unique_ptr<Factory<BoolTree<char>>> BoolTree<char>::factory = std::make_unique<StringBoolTreeFactory>();
+
+std::shared_ptr<BoolTree<char>> StringBoolTreeFactory::Build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) const
+{
+    return std::make_shared<StringBoolTree>(operation, nodes);
+}
+
 
 
 template<typename T>
@@ -67,7 +82,7 @@ std::shared_ptr<BoolTree<T>> BoolTree<T>::operator~()
     std::vector<std::shared_ptr<BoolTree<T>>> items;
     items.reserve(1);
     items.push_back(this->shared_from_this());
-    return this->build(Operations::Not, items);
+    return this->factory->Build(Operations::Not, items);
 }
 
 template<typename T>
@@ -77,7 +92,7 @@ std::shared_ptr<BoolTree<T>> BoolTree<T>::operator|(const std::shared_ptr<BoolTr
     items.reserve(2);
     items.push_back(this->shared_from_this());
     items.push_back(other);
-    return this->build(Operations::Or, items);
+    return this->factory->Build(Operations::Or, items);
 }
 
 template<typename T>
@@ -87,7 +102,7 @@ std::shared_ptr<BoolTree<T>> BoolTree<T>::operator&(const std::shared_ptr<BoolTr
     items.reserve(2);
     items.push_back(this->shared_from_this());
     items.push_back(other);
-    return this->build(Operations::And, items);
+    return this->factory->Build(Operations::And, items);
 }
 
 template<typename T>
@@ -97,8 +112,10 @@ std::shared_ptr<BoolTree<T>> BoolTree<T>::operator^(const std::shared_ptr<BoolTr
     items.reserve(2);
     items.push_back(this->shared_from_this());
     items.push_back(other);
-    return this->build(Operations::Xor, items);
+    return this->factory->Build(Operations::Xor, items);
 }
+
+
 
 template<typename T>
 class FlattenTreeSimpifier : ISimplifier<std::shared_ptr<BoolTree<T>>>
@@ -131,7 +148,7 @@ std::shared_ptr<BoolTree<T>> FlattenTreeSimpifier<T>::simplify(const std::shared
 {
     std::vector<std::shared_ptr<BoolTree<T>>> newnodes = {};
     recursive_flatten(newnodes, obj);
-    return obj.build(obj.ope, newnodes);
+    return obj->factory->Build(obj.ope, newnodes);
 }
 
 
@@ -148,23 +165,6 @@ std::ostream &
 operator<< (std::ostream &os, const std::shared_ptr<BoolTree<T>> &tree)
 {
     return os << *tree;
-};
-
-
-class StringBoolTree : public BoolTree<std::string>
-{
-    protected:
-        std::shared_ptr<BoolTree<std::string>> build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<std::string>>> &nodes) override;
-    public:
-        std::string FalseStr() override {return "0";};
-        std::string TrueStr() override {return "1";};
-};
-
-
-std::shared_ptr<BoolTree<std::string>> StringBoolTree::build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<std::string>>> &nodes)
-{
-    std::shared_ptr<StringBoolTree> child = std::make_shared<StringBoolTree>(operation, nodes);
-    return child;
 };
 
 
