@@ -323,7 +323,42 @@ std::shared_ptr<BoolTree<T>> equal_reference_tree_simplifier(const std::shared_p
         case Operations::Or:
         case Operations::And:
         case Operations::Xor:
-            return tree;
+        {
+            std::vector<unsigned char> bases;
+            std::vector<unsigned char> equals;
+            bases.reserve(tree->nodes.size());
+            equals.reserve(tree->nodes.size());
+            unsigned char index = 0;
+            
+            for (const auto& node : tree->nodes)
+            {
+                bool equal = false;
+                for (const auto &i : bases)
+                {
+                    if (node == tree->nodes[i])
+                    {
+                        equals.push_back(i);
+                        equal = true;
+                        break;
+                    }
+                }
+                if (!equal)
+                {
+                    bases.push_back(index);
+                    equals.push_back(index);
+                }
+                index++;
+            }
+            if (bases.size() == equals.size())
+                return tree;
+            std::vector<std::shared_ptr<BoolTree<T>>> newnodes;
+            newnodes.reserve(bases.size());
+            for (const auto &i : bases)
+            {
+                newnodes.push_back(tree->nodes[i]);
+            }
+            return tree->factory->build(tree->operation, newnodes);
+        }
     }
     throw std::is_error_condition_enum<Operations>();
 }
