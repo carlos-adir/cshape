@@ -10,8 +10,11 @@
 
 
 template <typename T>
-using ISimplifier = std::shared_ptr<T> (*)(const std::shared_ptr<T> &);
+using ISimplifier = T (*)(const T &);
 
+
+template <typename U, typename T>
+using IBuilder = T (*)(const U, const std::vector<T> &);
 
 enum class Operations
 {
@@ -24,35 +27,19 @@ enum class Operations
     Xor,
 };
 
-template <typename T>
-class BoolTreeFactory
-{
-public:
-    virtual std::shared_ptr<T> build(const Operations operation, const std::vector<std::shared_ptr<T>> nodes) const = 0;
-    std::shared_ptr<T> build(const Operations operation, const std::initializer_list<std::shared_ptr<T>> nodes) const {
-        std::vector<std::shared_ptr<T>> items = nodes;
-        return this->build(operation, items);
-    };
-    std::shared_ptr<T> True() const { return this->build(Operations::True, {});};
-    std::shared_ptr<T> False() const { return this->build(Operations::False, {});};
-};
-
-
-template <typename T>
-class BoolTree;
-
 
 template <typename T>
 class BoolTree {
     public:
         BoolTree(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> nodes);
-        
+    protected:
+        BoolTree();
     public:
         const Operations operation;
         const std::vector<std::shared_ptr<BoolTree<T>>> nodes;
 
-        static const std::unique_ptr<BoolTreeFactory<BoolTree<T>>> factory;
-        static const ISimplifier<BoolTree<T>> simplifier;
+        static const IBuilder<Operations, std::shared_ptr<BoolTree<T>>> build;
+        static const ISimplifier<std::shared_ptr<BoolTree<T>>> simplify;
 };
 
 
@@ -77,29 +64,36 @@ BoolTree<T>::BoolTree (const Operations operation, const std::vector<std::shared
 };
 
 
+
+template <typename T>
+BoolTree<T>::BoolTree () : BoolTree(Operations::Variable, {}) {};
+
+
+
+
 template<typename T>
 std::shared_ptr<BoolTree<T>> operator~(const std::shared_ptr<BoolTree<T>> &p)
 {
-    auto result = p->factory->build(Operations::Not, {p});
-    return p->simplifier == nullptr ? result : p->simplifier(result);
+    auto result = p->build(Operations::Not, {p});
+    return p->simplify == nullptr ? result : p->simplify(result);
 }
 template<typename T>
 std::shared_ptr<BoolTree<T>> operator|(const std::shared_ptr<BoolTree<T>> &a, const std::shared_ptr<BoolTree<T>> &b)
 {
-    auto result = a->factory->build(Operations::Or, {a, b});
-    return a->simplifier == nullptr ? result : a->simplifier(result);
+    auto result = a->build(Operations::Or, {a, b});
+    return a->simplify == nullptr ? result : a->simplify(result);
 }
 template<typename T>
 std::shared_ptr<BoolTree<T>> operator&(const std::shared_ptr<BoolTree<T>> &a, const std::shared_ptr<BoolTree<T>> &b)
 {
-    auto result = a->factory->build(Operations::And, {a, b});
-    return a->simplifier == nullptr ? result : a->simplifier(result);
+    auto result = a->build(Operations::And, {a, b});
+    return a->simplify == nullptr ? result : a->simplify(result);
 }
 template<typename T>
 std::shared_ptr<BoolTree<T>> operator^(const std::shared_ptr<BoolTree<T>> &a, const std::shared_ptr<BoolTree<T>> &b)
 {
-    auto result = a->factory->build(Operations::Xor, {a, b});
-    return a->simplifier == nullptr ? result : a->simplifier(result);
+    auto result = a->build(Operations::Xor, {a, b});
+    return a->simplify == nullptr ? result : a->simplify(result);
 }
 
 template<typename T>
@@ -121,13 +115,9 @@ bool operator!=(const std::shared_ptr<BoolTree<T>> &a, const std::shared_ptr<Boo
 }
 
 
-
-
-class StringBoolTree : public BoolTree<char>
+class StringBoolTree : public BoolTree<char> 
 {
-    public:
-        StringBoolTree(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) : BoolTree<char>(operation, nodes) {};
-        StringBoolTree(const Operations operation, const std::initializer_list<std::shared_ptr<BoolTree<char>>> nodes) : BoolTree<char>(operation, nodes) {};
+
 };
 
 
@@ -135,31 +125,16 @@ class StringBoolVariable : public StringBoolTree
 {
     private:
         const std::string name;
+        StringBoolVariable(const std::string &name) : StringBoolTree(), name(name){};
     public:
-        StringBoolVariable(const std::string &name) : StringBoolTree(Operations::Variable, {}), name(name){};
-        static std::shared_ptr<BoolTree<char>> build(const std::string &name) {return std::make_shared<StringBoolVariable>(name);};
+        static std::shared_ptr<BoolTree<char>> build(const std::string &name);
 };
 
-
-
-
-class StringBoolTreeFactory : public BoolTreeFactory<BoolTree<char>>
+std::shared_ptr<BoolTree<char>> StringBoolVariable::build(const std::string &name)
 {
-    public:
-        StringBoolTreeFactory() {};
-        std::shared_ptr<BoolTree<char>> build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) const override;
-    
-};
-
-
-template<>
-const std::unique_ptr<BoolTreeFactory<BoolTree<char>>> BoolTree<char>::factory = std::make_unique<StringBoolTreeFactory>();
-
-
-std::shared_ptr<BoolTree<char>> StringBoolTreeFactory::build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<char>>> nodes) const
-{
-    return std::make_shared<StringBoolTree>(operation, nodes);
+    return std::shared_ptr<StringBoolVariable>(new StringBoolVariable(name));
 }
+
 
 
 template<typename T>
@@ -175,9 +150,9 @@ std::shared_ptr<BoolTree<T>> false_true_tree_simpifier(const std::shared_ptr<Boo
         {
             const auto& item = false_true_tree_simpifier(tree->nodes[0]);
             if (item->operation == Operations::False)
-                return tree->factory->True();
+                return tree->build(Operations::True, {});
             if (item->operation == Operations::True)
-                return tree->factory->False();
+                return tree->build(Operations::False, {});
             return tree;
         }
         case Operations::Or:
@@ -196,7 +171,7 @@ std::shared_ptr<BoolTree<T>> false_true_tree_simpifier(const std::shared_ptr<Boo
             for (const auto& node : tree->nodes)
                 if (node->operation != Operations::False)
                     newnodes.push_back(node);
-            return tree->factory->build(Operations::Or, newnodes);
+            return tree->build(Operations::Or, newnodes);
         }
         case Operations::And:
         {
@@ -214,7 +189,7 @@ std::shared_ptr<BoolTree<T>> false_true_tree_simpifier(const std::shared_ptr<Boo
             for (const auto& node : tree->nodes)
                 if (node->operation != Operations::True)
                     newnodes.push_back(node);
-            return tree->factory->build(Operations::And, newnodes);
+            return tree->build(Operations::And, newnodes);
         }
         case Operations::Xor:
         {
@@ -235,9 +210,9 @@ std::shared_ptr<BoolTree<T>> false_true_tree_simpifier(const std::shared_ptr<Boo
             for (const auto& node : tree->nodes)
                 if (node->operation != Operations::True && node->operation != Operations::False)
                     newnodes.push_back(node);
-            auto result = tree->factory->build(Operations::Xor, newnodes);
+            auto result = tree->build(Operations::Xor, newnodes);
             if (nbtrues % 2)
-                result = tree->factory->build(Operations::Not, {result});
+                result = tree->build(Operations::Not, {result});
             return result;
         }
         default:
@@ -302,7 +277,7 @@ std::shared_ptr<BoolTree<T>> flatten_tree_simpifier(const std::shared_ptr<BoolTr
                 return tree;
             std::vector<std::shared_ptr<BoolTree<T>>> newnodes;
             recursive_flatten(newnodes, tree);
-            return tree->factory->build(tree->operation, newnodes);
+            return tree->build(tree->operation, newnodes);
         }
         default:
             throw std::is_error_condition_enum<Operations>();
@@ -357,7 +332,7 @@ std::shared_ptr<BoolTree<T>> equal_reference_tree_simplifier(const std::shared_p
             {
                 newnodes.push_back(tree->nodes[i]);
             }
-            return tree->factory->build(tree->operation, newnodes);
+            return tree->build(tree->operation, newnodes);
         }
     }
     throw std::is_error_condition_enum<Operations>();
@@ -376,7 +351,7 @@ std::shared_ptr<BoolTree<T>> single_item_simplifier(const std::shared_ptr<BoolTr
         case Operations::Not:
         {
             const auto& item = single_item_simplifier(tree->nodes[0]);
-            return tree->factory->build(Operations::Not, {item});
+            return tree->build(Operations::Not, {item});
         }
         case Operations::And:
         case Operations::Or:
@@ -384,7 +359,7 @@ std::shared_ptr<BoolTree<T>> single_item_simplifier(const std::shared_ptr<BoolTr
             switch (tree->nodes.size())
             {
                 case 0:
-                    return tree->operation == Operations::And ? tree->factory->True() : tree->factory->False();
+                    return tree->operation == Operations::And ? tree->build(Operations::True, {}) : tree->build(Operations::False, {});
                 case 1:
                     return tree->nodes[0];
                 default:
@@ -398,7 +373,7 @@ std::shared_ptr<BoolTree<T>> single_item_simplifier(const std::shared_ptr<BoolTr
 template<typename T>
 std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<BoolTree<T>> &tree)
 {
-    const static std::vector<ISimplifier<BoolTree<T>>> simplifiers = {
+    const static std::vector<ISimplifier<std::shared_ptr<BoolTree<T>>>> simplifiers = {
         false_true_tree_simpifier<T>,
         flatten_tree_simpifier<T>,
         equal_reference_tree_simplifier<T>,
@@ -409,7 +384,7 @@ std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<B
     while (cont)
     {
         cont = false;
-        for (const ISimplifier<BoolTree<T>> &simplifier : simplifiers)
+        for (const ISimplifier<std::shared_ptr<BoolTree<T>>> &simplifier : simplifiers)
         {
             std::shared_ptr<BoolTree<T>> newpt = simplifier(actual);
             if (newpt != actual)
@@ -421,13 +396,24 @@ std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<B
         }
     };
     return actual;
-    
 }
 
 
+template<>
+const ISimplifier<std::shared_ptr<BoolTree<char>>> BoolTree<char>::simplify = composition_tree_simplifier<char>;
+
+
+
+
+template<typename T>
+std::shared_ptr<BoolTree<T>> builder_char(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &items)
+{
+    return std::shared_ptr<BoolTree<T>>(new BoolTree<T>(operation, items)); 
+}
+
 
 template<>
-const ISimplifier<BoolTree<char>> BoolTree<char>::simplifier = composition_tree_simplifier<char>;
+const IBuilder<Operations, std::shared_ptr<BoolTree<char>>> BoolTree<char>::build = builder_char<char>;
 
 
 
