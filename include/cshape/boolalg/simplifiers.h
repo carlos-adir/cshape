@@ -15,6 +15,9 @@ template<typename T>
 std::shared_ptr<BoolTree<T>> single_item_simplifier(const std::shared_ptr<BoolTree<T>> &tree);
 
 template<typename T>
+std::shared_ptr<BoolTree<T>> implicants_tree_simplifier(const std::shared_ptr<BoolTree<T>> &tree);
+
+template<typename T>
 std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<BoolTree<T>> &tree);
 
 // include impl
