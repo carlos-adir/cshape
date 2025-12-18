@@ -9,6 +9,7 @@
 
 #include "boolalg/types.h"
 #include "boolalg/booltree.h"
+#include "boolalg/implicants.h"
 #include "boolalg/simplifiers.h"
 #include "boolalg/printer.h"
 

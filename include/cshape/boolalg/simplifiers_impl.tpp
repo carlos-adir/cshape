@@ -257,7 +257,7 @@ std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<B
         flatten_tree_simpifier<T>,
         equal_reference_tree_simplifier<T>,
         single_item_simplifier<T>,
-        implicants_tree_simplifier<T>,
+        // implicants_tree_simplifier<T>,
     };
     std::shared_ptr<BoolTree<T>> actual = tree;
     bool cont = true;
@@ -322,28 +322,6 @@ const std::vector<std::shared_ptr<BoolTree<T>>> find_variables(const std::shared
 }
 
 
-enum class ImpBit { False = 0, True = 1, NotCare = 2, };
-
-
-const std::vector<ImpBit> number2implicant(unsigned long number, const unsigned char size)
-{
-    std::vector<ImpBit> bits;
-    bits.reserve(size);
-    for (unsigned char i = 0; i < size; i++)
-    {
-        bits.push_back(number % 2 ? ImpBit::True : ImpBit::False);
-        number /= 2;
-    }
-    return bits;
-}
-
-
-struct Implicant
-{
-    Implicant(const unsigned long number, const unsigned char size) : bits(number2implicant(number, size)) {};
-    const std::vector<ImpBit> bits;
-};
-
 
 template<typename T>
 bool evaluate_tree(const std::shared_ptr<BoolTree<T>>& tree, const std::vector<std::shared_ptr<BoolTree<T>>> variables, const unsigned long number)
@@ -355,28 +333,36 @@ bool evaluate_tree(const std::shared_ptr<BoolTree<T>>& tree, const std::vector<s
         case Operations::True:
             return true;
         case Operations::Variable:
+        {
             unsigned char index = 0;
             while (tree != variables[index])
                 index++;
             return number & (1u << index);
+        }
         case Operations::Not:
             return !evaluate_tree<T>(tree->nodes[0], variables, number);
         case Operations::Or:
+        {
             for (const auto& node : tree->nodes)
                 if (evaluate_tree(node, variables, number))
                     return true;
             return false;
+        }
         case Operations::And:
+        {
             for (const auto& node : tree->nodes)
                 if (!evaluate_tree(node, variables, number))
                     return false;
             return true;
+        }
         case Operations::Xor:
+        {
             bool result = false;
             for (const auto& node : tree->nodes)
                 if (evaluate_tree(node, variables, number))
                     result = !result;
             return result;
+        }
         default:
             throw std::is_error_condition_enum<Operations>();
     }
@@ -405,8 +391,8 @@ std::shared_ptr<BoolTree<T>> implicants_tree_simplifier(const std::shared_ptr<Bo
     std::vector<Implicant> implicants;
     for (unsigned long index = 0; index < maxnumb; index++)
         if (evaluate_tree(tree, variables, index))
-            implicants.push_back(Implicant(index));
-    unsigned long indices;
+            implicants.push_back({index, 0});
+    // unsigned long indices;
     std::cout << "vars of " << tree << " = [";
     for (const auto & v : variables)
     {
