@@ -1,9 +1,19 @@
 project(CShape)
+cmake_minimum_required(VERSION 3.16)
 
-# add_library(cshape SHARED analytic.cpp polynomial.cpp)
-# add_library(cshape SHARED scalar.cpp bool1d.cpp bool2d.cpp)
-add_library(cshape SHARED scalar.cpp loggers.cpp boolalg.cpp rbool.cpp analytic.cpp geometry.cpp)
+# Collect all .cpp files under src (including subfolders)
+file(GLOB_RECURSE SRC_FILES
+     CONFIGURE_DEPENDS
+     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+
+# Optionally filter out CMakeLists.cpp or unwanted files (not usually needed)
+# list(FILTER SRC_FILES EXCLUDE REGEX ".*excluded_file.cpp$")
+
+add_library(cshape SHARED ${SRC_FILES})
 
 target_include_directories(cshape
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
+# Recommended: set C++ standard
+target_compile_features(cshape PUBLIC cxx_std_17)

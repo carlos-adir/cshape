@@ -79,16 +79,18 @@ void FileHandler::write(const LogMessage& message) const
 }
 
 
-static std::map<const std::string, const std::shared_ptr<FileHandler>> files = {};
+static std::unique_ptr<std::map<const std::string, const std::shared_ptr<FileHandler>>> files;
 
 std::shared_ptr<FileHandler> FileHandler::getInstance(const std::string& filename)
 {
-    std::cout << "Getting filehandler instance: " << filename.size() << ": '" << filename << "'" << std::endl;
-    if (!files.count(filename))
-        files.insert({filename, std::shared_ptr<FileHandler>(new FileHandler(filename))});
-    std::shared_ptr<FileHandler> handler = files.at(filename);
-    std::cout << "Got filehandler instance: " << handler->filename << ": '" << handler << "'" << std::endl;
-    return handler;
+    if (files == nullptr)
+        files = std::make_unique<std::map<const std::string, const std::shared_ptr<FileHandler>>>();
+    if (!files->count(filename))
+    {
+        auto pointer = std::shared_ptr<FileHandler>(new FileHandler(filename));
+        files->insert({filename, pointer});
+    }
+    return files->at(filename);
 }
 
 
@@ -126,23 +128,19 @@ bool TransmiterHandler::remove(const std::shared_ptr<IHandler> ptr)
 
 Logger::Logger(const std::string& loggerName) : name(loggerName)
 {
-    std::cout << "Created instance: '" << loggerName << "'" << std::endl;
     size_t i = loggerName.size() - 1;
     for (; i>0; --i)
         if (loggerName[i] == '.')
             break;
     if (i > 0)
     {
-        std::cout << "Adding handler" << std::endl;
         const std::string parentName = loggerName.substr(0, i);
         Logger& parent = getInstance(parentName);
         handler->add(parent.handler);
     }
     else
     {   
-        std::cout << "Adding cout" << std::endl;
         handler->add(std::make_shared<CoutHandler>());
-        std::cout << "Adding file" << std::endl;
         handler->add(FileHandler::getInstance(loggerName + ".log"));
     }
 }
@@ -169,17 +167,16 @@ void Logger::flush() const
 
 
 
-static std::map<const std::string, const std::shared_ptr<Logger>> loggers = {};
+static std::unique_ptr<std::map<const std::string, const std::shared_ptr<Logger>>> loggers;
 
 Logger& Logger::getInstance(const std::string& loggerName)
 {
-    std::cout << "Getting instance: " << loggerName.size() << ": '" << loggerName << "'" << std::endl;
-    if (!loggers.count(loggerName))
-        loggers.insert({loggerName,
+    if (loggers == nullptr)
+        loggers = std::make_unique<std::map<const std::string, const std::shared_ptr<Logger>>>();
+    if (!loggers->count(loggerName))
+        loggers->insert({loggerName,
                         std::shared_ptr<Logger>(new Logger(loggerName))});
-    Logger& logger = *loggers.at(loggerName);
-    std::cout << "Got instance: " << logger.name << ": '" << &logger << "'" << std::endl;
-    return logger;
+    return *loggers->at(loggerName);
 }
 
 
