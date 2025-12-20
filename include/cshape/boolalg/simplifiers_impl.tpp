@@ -1,5 +1,7 @@
 #pragma once
 
+#include "implicants.h"
+#include <iostream>
 
 template<typename T>
 std::shared_ptr<BoolTree<T>> false_true_tree_simpifier(const std::shared_ptr<BoolTree<T>> &tree)

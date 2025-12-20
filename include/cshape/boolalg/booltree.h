@@ -14,6 +14,7 @@ public:
     const Operations operation;
     const std::vector<std::shared_ptr<BoolTree<T>>> nodes;
 
+    static std::shared_ptr<BoolTree<T>> Build(const Operations operation, const std::vector<std::shared_ptr<BoolTree<T>>> &nodes) {return std::shared_ptr<BoolTree<T>>(new BoolTree(operation, nodes));}
     static const IBoolTreeBuilder<BoolTree<T>> build;
     static const ISimplifier<BoolTree<T>> simplify;
 };
