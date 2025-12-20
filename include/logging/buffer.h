@@ -8,17 +8,13 @@
 
 const static char ENDL = '\n';
 
-using ISendMessage = void (*)(const std::string &);
-
 class Buffer
 {
 private:
-    const ISendMessage flusher;
     const std::unique_ptr<std::ostringstream> stream = std::make_unique<std::ostringstream>();
 public:
     std::string str;
-    Buffer(const ISendMessage flusher) : flusher(flusher) {};
-    void flush();
+    Buffer() = default;
     void clear();
 
     template<typename T>

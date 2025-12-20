@@ -18,7 +18,6 @@ private:
     const LogLevel level;
     const LoggerName name;
     const std::shared_ptr<IHandler> handler;
-    void flush(const std::string& message);
 public:
     MessageSender(const LogLevel level, const LoggerName name, const std::shared_ptr<IHandler>& handler) : level(level), name(name), handler(handler) {};
     ~MessageSender() = default;
@@ -26,7 +25,6 @@ public:
     template<typename T>
     const MessageSender& operator<<(const T& obj) const;
 };
-
 
 #include "sender_impl.tpp"
 
