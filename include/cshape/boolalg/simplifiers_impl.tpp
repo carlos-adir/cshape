@@ -391,7 +391,7 @@ std::shared_ptr<BoolTree<T>> implicants_tree_simplifier(const std::shared_ptr<Bo
     std::vector<Implicant> implicants;
     for (unsigned long index = 0; index < maxnumb; index++)
         if (evaluate_tree(tree, variables, index))
-            implicants.push_back({index, 0});
+            implicants.push_back(Implicant(Binary(index, size)));
     // unsigned long indices;
     std::cout << "vars of " << tree << " = [";
     for (const auto & v : variables)

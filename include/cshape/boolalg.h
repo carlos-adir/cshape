@@ -7,6 +7,9 @@
 #include <cstddef>
 #include <array>
 
+
+
+#include "boolalg/binary.h"
 #include "boolalg/types.h"
 #include "boolalg/booltree.h"
 #include "boolalg/implicants.h"

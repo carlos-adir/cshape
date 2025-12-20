@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BOOLALG_SIMPLIFY_H
+#define BOOLALG_SIMPLIFY_H
+
 #include "types.h"
 #include "booltree.h"
 
@@ -22,3 +24,5 @@ std::shared_ptr<BoolTree<T>> composition_tree_simplifier(const std::shared_ptr<B
 
 // include impl
 #include "simplifiers_impl.tpp"
+
+#endif

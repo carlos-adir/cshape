@@ -1,7 +1,10 @@
+#ifndef BOOLALG_PRINTER_H
+#define BOOLALG_PRINTER_H
 
 #include <iostream>
 #include <memory>
 #include "booltree.h"
+
 
 template <typename T>
 std::ostream &
@@ -41,3 +44,6 @@ operator<< (std::ostream &os, const std::shared_ptr<BoolTree<T>> &tree)
     }
     return os << "]";
 };
+
+
+#endif

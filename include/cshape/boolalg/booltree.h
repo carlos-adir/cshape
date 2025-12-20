@@ -1,7 +1,10 @@
-#pragma once
+#ifndef BOOLALG_BOOLTREE_H
+#define BOOLALG_BOOLTREE_H
+
 #include "types.h"
 #include <stdexcept>
 #include <ostream>
+
 
 template <typename T>
 class BoolTree {
@@ -18,3 +21,4 @@ public:
 // include template implementations
 #include "booltree_impl.tpp"
 
+#endif

@@ -1,5 +1,6 @@
+#ifndef BOOLALG_TYPES_H
+#define BOOLALG_TYPES_H
 
-#pragma once
 #include <vector>
 #include <memory>
 
@@ -11,3 +12,4 @@ using ISimplifier = std::shared_ptr<T> (*)(const std::shared_ptr<T> &);
 template <typename T>
 using IBoolTreeBuilder = std::shared_ptr<T> (*)(const Operations, const std::vector<std::shared_ptr<T>> &);
 
+#endif
