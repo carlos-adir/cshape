@@ -5,12 +5,9 @@
 static const std::uint8_t sizet = 8 * sizeof(byte);
 
 
-Binary::Binary(const std::vector<byte> bytes, const itetype nbits): bytes(bytes[bytes.size()-1]), nbits(nbits) {};
+Binary::Binary(const std::vector<byte> bytes, const itetype nbits): bytes(bytes), nbits(nbits) {};
 
 Binary::Binary(const Binary& other) : bytes(other.bytes), nbits(other.nbits) {};
-
-
-
 
 template<typename T>
 std::vector<byte> as_bytes(const T& value, const itetype nbits)
@@ -34,7 +31,7 @@ Binary::operator bool() const noexcept
     return false;
 }
 
-Binary& Binary::operator<<=(const unsigned char shift)
+Binary& Binary::operator<<=(const itetype shift)
 {
     for (auto& b : bytes)
     {
@@ -43,21 +40,7 @@ Binary& Binary::operator<<=(const unsigned char shift)
     return *this;
 }
 
-Binary Binary::operator>>(const unsigned char shift)
-{
-    Binary item = Binary(*this);
-    item >>= shift;
-    return item;
-}
-
-Binary Binary::operator<<(const unsigned char shift)
-{
-    Binary item = Binary(*this);
-    item <<= shift;
-    return item;
-}
-
-Binary& Binary::operator>>=(const unsigned char shift)
+Binary& Binary::operator>>=(const itetype shift)
 {
     for (auto& b : bytes)
     {
@@ -75,9 +58,9 @@ Binary Binary::operator|(const Binary& other) const
         throw std::invalid_argument("Or Different bits");
     }
     std::vector<byte> newbs;
-    newbs.reserve(bytes.size());
-    for (itetype i = 0; i < nbits; i++)
-        newbs.push_back(bytes[i] | other.bytes[i]);
+    newbs.reserve(this->bytes.size());
+    for (itetype i = 0; i < this->bytes.size(); i++)
+        newbs.push_back(this->bytes[i] | other.bytes[i]);
     return Binary(newbs, this->nbits);
 }
 
@@ -91,12 +74,8 @@ Binary Binary::operator&(const Binary& other) const
     }
     std::vector<byte> newbs;
     newbs.reserve(bytes.size());
-    for (itetype i = 0; i < nbits; i++)
-    {
-        auto a = bytes[i] & other.bytes[i];
-        std::cout << "b: " << (int)(bytes[i]) << "&" << (int)(other.bytes[i]) << "=" << (int)a << std::endl;
-        newbs.push_back(a);
-    }
+    for (itetype i = 0; i < this->bytes.size(); i++)
+        newbs.push_back(bytes[i] & other.bytes[i]);
     return Binary(newbs, this->nbits);
 }
 
@@ -110,9 +89,24 @@ Binary Binary::operator^(const Binary& other) const
     }
     std::vector<byte> newbs;
     newbs.reserve(bytes.size());
-    for (itetype i = 0; i < nbits; i++)
+    for (itetype i = 0; i < this->bytes.size(); i++)
         newbs.push_back(bytes[i] ^ other.bytes[i]);
     return Binary(newbs, this->nbits);
+}
+
+
+bool Binary::operator==(const Binary& other) const 
+{
+    if (this->nbits != other.nbits)
+    {
+        std::cout << (int)this->nbits << " != " << (int)other.nbits << std::endl;
+        std::cout << *this << " != " << other << std::endl;
+        throw std::invalid_argument("Equal Different bits");
+    }
+    for (itetype i = 0; i < this->bytes.size(); i++)
+        if (this->bytes[i] != other.bytes[i])
+            return false;
+    return true;
 }
 
 std::ostream &operator<<(std::ostream &os, const Binary &obj)

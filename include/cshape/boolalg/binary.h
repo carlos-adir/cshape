@@ -20,18 +20,18 @@ public:
     
     Binary(const Binary& other);
     
-    explicit Binary(const byte number, const itetype nbits);
+    explicit Binary(const byte number, const itetype nbits = 0);
 
 
     operator bool() const noexcept;
 
     Binary& operator<<=(const itetype n);
     Binary& operator>>=(const itetype n);
-    Binary operator<<(const itetype n);
-    Binary operator>>(const itetype n);
     Binary operator|(const Binary& other) const;
     Binary operator&(const Binary& other) const;
     Binary operator^(const Binary& other) const;
+
+    bool operator==(const Binary& other) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Binary &obj);   
 };
