@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
-#include "cshape/loggers.h"
+#include "cshape/logging.h"
 #include "cshape/rbool.h"
 
 static Logger& logger = Logger::getInstance("test.rbool");

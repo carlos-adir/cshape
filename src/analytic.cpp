@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "cshape/loggers.h"
 #include "cshape/analytic.h"
+#include "cshape/logging.h"
 
 const static Logger& logger = Logger::getInstance("cshape.analytic");
 

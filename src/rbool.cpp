@@ -1,6 +1,6 @@
 
 #include "cshape/rbool.h"
-#include "cshape/loggers.h"
+#include "cshape/logging.h"
 
 const static Logger& logger = Logger::getInstance("cshape.rbool");
 
