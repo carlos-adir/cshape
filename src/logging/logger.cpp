@@ -35,6 +35,7 @@ std::shared_ptr<Logger> Logger::getInstance(const LoggerName& loggerName)
     if (!loggers->count(loggerName))
     {
         auto newLogger = std::shared_ptr<Logger>(new Logger(loggerName));
+        newLogger->debug.handler = newLogger;
         loggers->insert({loggerName, newLogger});
     }
     return loggers->at(loggerName);

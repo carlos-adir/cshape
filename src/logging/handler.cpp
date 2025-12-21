@@ -26,22 +26,21 @@ FileHandler::~FileHandler()
 
 void FileHandler::write(const LogMessage& message) const
 {
-    std::cout << "Writing on file: '" << filepath << "'" << std::endl;
     stream << message << std::endl;
 }
 
 static std::unique_ptr<std::map<const Filepath, const std::shared_ptr<FileHandler>>> files;
 
-std::shared_ptr<FileHandler> FileHandler::getInstance(const Filepath& filename)
+std::shared_ptr<FileHandler> FileHandler::getInstance(const Filepath& filepath)
 {
     if (files == nullptr)
         files = std::make_unique<std::map<const Filepath, const std::shared_ptr<FileHandler>>>();
-    if (!files->count(filename))
+    if (!files->count(filepath))
     {
-        auto pointer = std::shared_ptr<FileHandler>(new FileHandler(filename));
-        files->insert({filename, pointer});
+        auto pointer = std::shared_ptr<FileHandler>(new FileHandler(filepath));
+        files->insert({filepath, pointer});
     }
-    return files->at(filename);
+    return files->at(filepath);
 }
 
 
@@ -62,6 +61,7 @@ bool TransmiterHandler::operator+=(const std::shared_ptr<IHandler> ptr)
     for (const auto& handler : handlers)
         if (ptr == handler)
             return false;
+    std::cout << "Pushback ptr " << ptr << std::endl;
     this->handlers.push_back(ptr);
     return true;
 }

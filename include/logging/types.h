@@ -14,4 +14,7 @@ typedef std::string Message;
 
 typedef std::string Filepath;
 
+
+class Logger;
+
 #endif

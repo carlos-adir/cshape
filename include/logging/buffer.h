@@ -16,6 +16,16 @@ public:
     std::string str;
     Buffer() = default;
     
+    inline bool empty() const noexcept
+    {
+        return str.empty();
+    }
+
+    inline char last() const noexcept
+    {
+        return str.back();
+    }
+
     void clear()
     {
         stream->str("");

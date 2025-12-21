@@ -17,8 +17,8 @@ private:
     const std::unique_ptr<Buffer> buffer = std::make_unique<Buffer>();
     const LogLevel level;
     const LoggerName name;
+    mutable std::weak_ptr<IHandler> handler;
 public:
-    const std::shared_ptr<IHandler> handler = nullptr;
     MessageSender() :
         level(LogLevel::DEBUG),
         name("") {};
@@ -30,17 +30,21 @@ public:
     template<typename T>
     const MessageSender& operator<<(const T& obj) const
     {
-        if (handler != nullptr && handler->is_active)
+        const auto tmp = handler.lock();
+        if (tmp && tmp->is_active)
         {
             *buffer << obj;
-            if (buffer->str.back() == ENDL)
+            if (!buffer->empty() && buffer->last() == ENDL)
             {
                 const LogMessage msg(level, name, buffer->str.substr(0, buffer->str.size()-1));
-                handler->write(msg);
+                tmp->write(msg);
+                buffer->clear();
             }
         }
         return *this;
     }
+
+    friend class Logger;
 };
 
 #endif
