@@ -15,14 +15,20 @@ private:
 public:
     std::string str;
     Buffer() = default;
-    void clear();
+    
+    void clear()
+    {
+        stream->str("");
+        stream->clear();
+    }
 
     template<typename T>
-    Buffer& operator<<(const T& obj);
+    Buffer& operator<<(const T& obj)
+    {
+        *stream << obj;
+        str = stream->str();
+        return *this;
+    }
 };
-
-
-
-#include "buffer_impl.tpp"
 
 #endif

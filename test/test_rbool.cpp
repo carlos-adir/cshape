@@ -7,7 +7,7 @@
 #include "cshape/logging.h"
 #include "cshape/rbool.h"
 
-static Logger& logger = Logger::getInstance("test.rbool");
+static const auto logger = Logger::getInstance("test.rbool");
 
 TEST(Bool1DTest, BuildsSpecial)
 {
@@ -24,17 +24,17 @@ TEST(Bool1DTest, BuildsInterval)
 {
     double fa(-10), fb(10);
     
-    logger << "Initialize BuildsInterval";
-    logger << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fa);
-    logger << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fb);
-    logger << SubSetR1<Scalar>::Between(fa, fb);
-    logger << SubSetR1<Scalar>::Between(fa, SubSetR1<Scalar>::POSINF);
-    logger << SubSetR1<Scalar>::Between(fb, SubSetR1<Scalar>::POSINF);
-    logger << SubSetR1<Scalar>::Lower(fa);
-    logger << SubSetR1<Scalar>::Lower(fb);
-    logger << SubSetR1<Scalar>::Bigger(fa);
-    logger << SubSetR1<Scalar>::Bigger(fb);
-    logger << "Finish Builds Interval";
+    logger->debug << "Initialize BuildsInterval";
+    logger->debug << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fa);
+    logger->debug << SubSetR1<Scalar>::Between(SubSetR1<Scalar>::NEGINF, fb);
+    logger->debug << SubSetR1<Scalar>::Between(fa, fb);
+    logger->debug << SubSetR1<Scalar>::Between(fa, SubSetR1<Scalar>::POSINF);
+    logger->debug << SubSetR1<Scalar>::Between(fb, SubSetR1<Scalar>::POSINF);
+    logger->debug << SubSetR1<Scalar>::Lower(fa);
+    logger->debug << SubSetR1<Scalar>::Lower(fb);
+    logger->debug << SubSetR1<Scalar>::Bigger(fa);
+    logger->debug << SubSetR1<Scalar>::Bigger(fb);
+    logger->debug << "Finish Builds Interval";
 }
 
 

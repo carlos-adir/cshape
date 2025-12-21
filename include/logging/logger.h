@@ -8,25 +8,19 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include "message.h"
 #include "handler.h"
-
-
+#include "sender.h"
 
 class Logger : public TransmiterHandler {
 private:
-    Logger(const std::string& loggerName);
+    Logger(const LoggerName& loggerName);
 
 public:
     ~Logger();
     const LoggerName name;
-    static Logger& getInstance(const std::string& filename);
-    
-    void log(const LogLevel level, const std::string &message) const;
-    template<typename T>
-    const Logger& operator<<(const T& obj) const {
-        return *this;
-    }
+    static std::shared_ptr<Logger> getInstance(const LoggerName& filename);
+
+    const MessageSender debug;
 };
 
 #endif

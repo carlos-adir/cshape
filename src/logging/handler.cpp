@@ -12,7 +12,9 @@ void CoutHandler::write(const LogMessage& message) const
 }
 
 
-FileHandler::FileHandler(const std::string& filename) : stream(*new std::ofstream(filename)), filename(filename)
+FileHandler::FileHandler(const Filepath& filepath) :
+    stream(*new std::ofstream(filepath)),
+    filepath(filepath)
 {
 }
 
@@ -22,20 +24,18 @@ FileHandler::~FileHandler()
     delete &stream;
 }
 
-
 void FileHandler::write(const LogMessage& message) const
 {
-    std::cout << "Writing on file: '" << filename << "'" << std::endl;
-    stream << std::string(message) << std::endl;
+    std::cout << "Writing on file: '" << filepath << "'" << std::endl;
+    stream << message << std::endl;
 }
 
+static std::unique_ptr<std::map<const Filepath, const std::shared_ptr<FileHandler>>> files;
 
-static std::unique_ptr<std::map<const std::string, const std::shared_ptr<FileHandler>>> files;
-
-std::shared_ptr<FileHandler> FileHandler::getInstance(const std::string& filename)
+std::shared_ptr<FileHandler> FileHandler::getInstance(const Filepath& filename)
 {
     if (files == nullptr)
-        files = std::make_unique<std::map<const std::string, const std::shared_ptr<FileHandler>>>();
+        files = std::make_unique<std::map<const Filepath, const std::shared_ptr<FileHandler>>>();
     if (!files->count(filename))
     {
         auto pointer = std::shared_ptr<FileHandler>(new FileHandler(filename));

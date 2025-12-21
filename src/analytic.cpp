@@ -5,23 +5,23 @@
 #include "cshape/analytic.h"
 #include "cshape/logging.h"
 
-const static Logger& logger = Logger::getInstance("cshape.analytic");
+const static auto logger = Logger::getInstance("cshape.analytic");
 
 template <typename O>
 uint1 find_degree(const std::vector<O> &coefs)
 {
-    logger << "Find degree of vector of size: " << coefs.size() << ENDL;
+    logger->debug <<"Find degree of vector of size: " << coefs.size() << ENDL;
     if (coefs.size() == 0)
         return 0;
     for (const O& coef : coefs)
-        logger << coef << ENDL;
+        logger->debug <<coef << ENDL;
     for (uint1 i = coefs.size()-1; i>0; --i)
         if (coefs[i])
         {
-            logger << "    found " << i << ENDL;
+            logger->debug <<"    found " << i << ENDL;
             return i;
         }
-    logger << "    found #0" << ENDL;
+    logger->debug << "    found #0" << ENDL;
     return 0;
 }
 

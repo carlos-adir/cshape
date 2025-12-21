@@ -14,18 +14,33 @@
 
 class MessageSender {
 private:
-    const std::unique_ptr<Buffer> buffer;
+    const std::unique_ptr<Buffer> buffer = std::make_unique<Buffer>();
     const LogLevel level;
     const LoggerName name;
-    const std::shared_ptr<IHandler> handler;
 public:
-    MessageSender(const LogLevel level, const LoggerName name, const std::shared_ptr<IHandler>& handler) : level(level), name(name), handler(handler) {};
+    const std::shared_ptr<IHandler> handler = nullptr;
+    MessageSender() :
+        level(LogLevel::DEBUG),
+        name("") {};
+    MessageSender(const LogLevel level, const LoggerName name) :
+        level(level),
+        name(name) {};
     ~MessageSender() = default;
     
     template<typename T>
-    const MessageSender& operator<<(const T& obj) const;
+    const MessageSender& operator<<(const T& obj) const
+    {
+        if (handler != nullptr && handler->is_active)
+        {
+            *buffer << obj;
+            if (buffer->str.back() == ENDL)
+            {
+                const LogMessage msg(level, name, buffer->str.substr(0, buffer->str.size()-1));
+                handler->write(msg);
+            }
+        }
+        return *this;
+    }
 };
-
-#include "sender_impl.tpp"
 
 #endif

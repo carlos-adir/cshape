@@ -2,7 +2,7 @@
 #include "cshape/rbool.h"
 #include "cshape/logging.h"
 
-const static Logger& logger = Logger::getInstance("cshape.rbool");
+const static auto logger = Logger::getInstance("cshape.rbool");
 
 
 template<typename T>
@@ -69,19 +69,19 @@ SubSetR1<T>::SubSetR1(const std::vector<T> &finites,
                    const std::vector<IntervalR1<T>> &intervals):
     finites(finites), intervals(intervals), typo(find_typo(finites, intervals))
     {
-        logger << "Inside SubSetR1<T> constructor" << ENDL;
-        logger << "Finites = {";
+        logger->debug << "Inside SubSetR1<T> constructor" << ENDL;
+        logger->debug << "Finites = {";
         for (auto finite : finites)
         {
-            logger << finite << ", ";
+            logger->debug <<finite << ", ";
         }
-        logger << "}" << ENDL;
-        logger << "Intervals = ";
+        logger->debug << "}" << ENDL;
+        logger->debug << "Intervals = ";
         for (auto interval : intervals)
         {
-            logger << interval << " U ";
+            logger->debug <<interval << " U ";
         }
-        logger << "}" << ENDL;
+        logger->debug <<"}" << ENDL;
         const size_t fsize = finites.size();
         const size_t isize = intervals.size();
         for (size_t i = 0; i + 1 < fsize; ++i)
@@ -169,22 +169,22 @@ void compute_middle(const std::vector<T> &knots,
 template<typename T>
 SubSetR1<T> SubSetR1<T>::operator~() const
 {
-    logger << "Begin SubSetR1<T>::operator~" << ENDL;
-    logger << *this << ENDL;
+    logger->debug <<"Begin SubSetR1<T>::operator~" << ENDL;
+    logger->debug <<*this << ENDL;
     switch (typo)
     {
         case SubSetR1Typo::Empty:
-            logger << "Return Whole" << ENDL;
+            logger->debug <<"Return Whole" << ENDL;
             return SubSetR1<T>::Whole();
         case SubSetR1Typo::Whole:
-            logger << "Return Empty" << ENDL;
+            logger->debug <<"Return Empty" << ENDL;
             return SubSetR1<T>::Empty();
         case SubSetR1Typo::Point:
         {
             IntervalR1<T> left = {NEGINF, this->finites[0], CLOSED_INF, false};
             IntervalR1<T> right = {this->finites[0],  SubSetR1<T>::POSINF, false, CLOSED_INF};
             SubSetR1<T> inverted = SubSetR1<T>({}, {left, right});
-            logger << "Return " << inverted << ENDL;
+            logger->debug <<"Return " << inverted << ENDL;
             return inverted;
         }
         case SubSetR1Typo::Interval:
@@ -193,19 +193,19 @@ SubSetR1<T> SubSetR1<T>::operator~() const
             if (interval.start == SubSetR1<T>::NEGINF)
             {
                 SubSetR1<T> inverted = SubSetR1<T>::Bigger(interval.end, !interval.closed_right);
-                logger << "Return " << inverted << ENDL;
+                logger->debug <<"Return " << inverted << ENDL;
                 return inverted;
             }
             else if (interval.end ==  SubSetR1<T>::POSINF)
             {
                 SubSetR1<T> inverted = SubSetR1<T>::Lower(interval.start, !interval.closed_left);
-                logger << "Return " << inverted << ENDL;
+                logger->debug <<"Return " << inverted << ENDL;
                 return inverted;
             }
             IntervalR1<T> left = {NEGINF, this->intervals[0].start, CLOSED_INF, !this->intervals[0].closed_left};
             IntervalR1<T> right = {this->intervals[0].end,  SubSetR1<T>::POSINF, !this->intervals[0].closed_right, CLOSED_INF};
             SubSetR1<T> inverted = SubSetR1<T>({}, {left, right});
-            logger << "Return " << inverted << ENDL;
+            logger->debug <<"Return " << inverted << ENDL;
             return inverted;
         }
         case SubSetR1Typo::Disjoint:
@@ -237,7 +237,7 @@ SubSetR1<T> SubSetR1<T>::operator~() const
             std::vector<IntervalR1<T>> intervals;
             compute_middle(knots, inside, finites, intervals);
             SubSetR1<T> inverted = SubSetR1<T>(finites, intervals);
-            logger << "Return " << inverted << ENDL;
+            logger->debug <<"Return " << inverted << ENDL;
             return inverted;
         }
         default:
@@ -249,8 +249,8 @@ SubSetR1<T> SubSetR1<T>::operator~() const
 template<typename T>
 SubSetR1<T> SubSetR1<T>::operator|(const SubSetR1<T> &other) const
 {
-    logger << "Begin SubSetR1<T>::operator|" << ENDL;
-    logger << *this << " | " << other << ENDL;
+    logger->debug <<"Begin SubSetR1<T>::operator|" << ENDL;
+    logger->debug <<*this << " | " << other << ENDL;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return *this;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
@@ -297,8 +297,8 @@ SubSetR1<T> SubSetR1<T>::operator|(const SubSetR1<T> &other) const
 template<typename T>
 SubSetR1<T> SubSetR1<T>::operator&(const SubSetR1<T> &other) const
 {
-    logger << "Begin SubSetR1<T>::operator&" << ENDL;
-    logger << *this << " & " << other << ENDL;
+    logger->debug <<"Begin SubSetR1<T>::operator&" << ENDL;
+    logger->debug <<*this << " & " << other << ENDL;
     if (this->contains(other))  // Take cares of whole |= other or *this |= empty
         return other;
     if (other.contains(*this))  // Take cares of empty |= other or *this |= whole
@@ -347,15 +347,15 @@ void compute_middle(const std::vector<T> &knots,
                     std::vector<T> &finites,
                     std::vector<IntervalR1<T>> &intervals)
 {
-    logger << "Inside 'compute_middle'" << ENDL;
-    logger << "Received knots: {" << knots[0];
+    logger->debug <<"Inside 'compute_middle'" << ENDL;
+    logger->debug <<"Received knots: {" << knots[0];
     for (size_t i = 1; i < knots.size(); ++i)
-        logger << ", " << knots[i];
-    logger << "}" << ENDL;
-    logger << "Received inside: {" << inside[0];
+        logger->debug <<", " << knots[i];
+    logger->debug <<"}" << ENDL;
+    logger->debug <<"Received inside: {" << inside[0];
     for (size_t i = 1; i < inside.size(); ++i)
-        logger << ", " << inside[i];
-    logger << "}" << ENDL;
+        logger->debug <<", " << inside[i];
+    logger->debug <<"}" << ENDL;
     T start = SubSetR1<T>::NEGINF;
     bool closed = false;
     for(size_t i = 0; i < knots.size(); ++i){

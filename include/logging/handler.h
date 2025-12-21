@@ -10,7 +10,6 @@
 #include <memory>
 #include "message.h"
 
-
 class IHandler 
 {
     public:
@@ -29,13 +28,13 @@ class CoutHandler : public IHandler
 class FileHandler : public IHandler
 {
     private:
-        FileHandler(const std::string& filename);
+        FileHandler(const Filepath& filepath);
         std::ofstream& stream;
         
     public:
-        const std::string filename;
+        const Filepath filepath;
         ~FileHandler();
-        static std::shared_ptr<FileHandler> getInstance(const std::string& filename); 
+        static std::shared_ptr<FileHandler> getInstance(const Filepath& filepath); 
         void write(const LogMessage& message) const override;
 };
 

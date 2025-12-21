@@ -30,23 +30,7 @@ std::ostream &operator<<(std::ostream &os, const LogMessage &obj){
 
     os << '[' << timestamp << "] ";
     os << levelToString(obj.level) << ": ";
-    os << '(' << obj.logger << ')';
+    os << '(' << obj.loggerName <<')';
     os << obj.message;
     return os;
 }
-
-
-LogMessage::operator std::string() const
-{
-    std::ostringstream ss;
-    tm* timeinfo = localtime(&curtime);
-    char timestamp[20];
-    strftime(timestamp, sizeof(timestamp),
-             "%Y-%m-%d %H:%M:%S", timeinfo);
-
-    ss << '[' << timestamp << "] ";
-    ss << levelToString(level) << ": ";
-    ss << '(' << logger << ')';
-    ss << message;
-    return ss.str();
-};
